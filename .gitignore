@@ -85,3 +85,6 @@ $RECYCLE.BIN/
 
 # Ignore local environment settings
 .env
+
+#react related ignores
+node_modules/
