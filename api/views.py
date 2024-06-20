@@ -4,6 +4,6 @@ from .serializers import MediaSerializer
 from .models import Media
 # Create your views here.
 
-class MediaView(generics.ListAPIView):
+class MediaView(generics.CreateAPIView):
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
