@@ -3,5 +3,5 @@ python manage.py runserver
 npm run start
 .\djangoenv\Scripts\activate
 djangoenv\Scripts\deactivate
-8000 for production build
+8000 for production build and api
 5173 for react development
