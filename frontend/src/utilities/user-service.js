@@ -1,11 +1,11 @@
 //path
 //user-service
-//users-api
+//user-api
 //send-request
-import * as usersAPI from './user-api';
+import * as userAPI from './user-api';
 
 export async function signUp(userData) {
-  const token = await usersAPI.signUp(userData);
+  const token = await userAPI.signUp(userData);
   //store token in local storage
   localStorage.setItem('token', token);
   return getUser();
@@ -22,16 +22,18 @@ export function getToken() {
   if (payload.exp < Date.now() / 1000) {
     localStorage.removeItem('token');
     return null;
-   }
-   return token;
+  }
+  return token;
 }
 
-export function getUser() {
-  const token = getToken();
-  return token ?
-    JSON.parse(atob(token.split('.')[1])).user
-    :
-    null;
+export async function getUser() {
+  try {
+    const userData = await userAPI.grabUser();
+    return userData;
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    return null;
+  }
 }
 
 export function logOut() {
@@ -39,12 +41,12 @@ export function logOut() {
 }
 
 export async function login(credentials) {
-  const token = await usersAPI.login(credentials);
-  localStorage.setItem('token', token);
+  const token = await userAPI.login(credentials);
+  localStorage.setItem('token', token.jwt);
   return getUser();
 }
 
 export function checkToken() {
-  return usersAPI.checkToken()
+  return userAPI.checkToken()
     .then(dateStr => new Date(dateStr));
 }

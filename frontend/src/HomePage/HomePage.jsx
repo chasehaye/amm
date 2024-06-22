@@ -1,19 +1,18 @@
-import { useUser } from "../GlobalProvider"
+import React, { useContext } from 'react';
+import { UserContext } from '../UserProvider';
 
 function Home() {
 
-    const { user } = useUser();
+    const { user, setUser } = useContext(UserContext);
 
-    return(
+    return (
         <>
-        <h1>Home Page</h1>
-        {user.loggedInUser ? (
-                <p>Welcome, {user.loggedInUser}!</p>
-            ) : (
-                <p>Please log in to see your personalized content.</p>
-            )}
+            <h1>Home Page</h1>
+            <div>
+                <p>User: {user ? user.name : 'No user logged in'}</p>
+            </div>
         </>
-    )
+    );
 }
 
 export default Home

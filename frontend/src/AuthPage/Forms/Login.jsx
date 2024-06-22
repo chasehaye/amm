@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import * as userService from '../../utilities/user-service'
-import { useUser } from '../../GlobalProvider';
 
 function Login() {
     const [credentials, setCredentials] = useState({
@@ -22,6 +21,8 @@ function Login() {
         // will resolve to the user object included in the
         // payload of the JSON Web Token (JWT)
         const user = await userService.login(credentials);
+        console.log(user)
+
         setUser(user);
     } catch {
         setError('Log In Failed');
