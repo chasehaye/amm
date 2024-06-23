@@ -29,8 +29,8 @@ export async function getUser() {
   try {
     const userData = await userAPI.grabUser();
     return userData;
-  } catch (error) {
-    console.error('Error fetching user:', error);
+  } catch (err) {
+    console.error('Error fetching user:', err);
     return null;
   }
 }
