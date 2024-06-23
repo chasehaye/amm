@@ -3,13 +3,14 @@ import { UserContext } from '../UserProvider';
 
 function Home() {
 
-    const { user, setUser } = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
     return (
         <>
             <h1>Home Page</h1>
             <div>
-                <p>User: {user ? user.name : 'No user logged in'}</p>
+                <p>The user is globally accesible below:</p>
+                <p> {user ? user.name : 'No user logged in'}</p>
             </div>
         </>
     );

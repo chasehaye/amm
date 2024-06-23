@@ -10,6 +10,12 @@ import jwt, datetime
 class RegisterView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            print("Step 3: Validation failed")
+            print("Validation errors:", serializer.errors)
+            return Response(serializer.errors, status=400)
+
         serializer.is_valid(raise_exception=True)
         serializer.save()
         payload = {
@@ -65,7 +71,6 @@ class UserView(APIView):
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Unauthenticated')
-        
         user = User.objects.filter(id=payload['id']).first()
         serializer = UserSerializer(user)
         return Response(serializer.data)

@@ -12,7 +12,3 @@ export function login(credentials) {
 export function grabUser() {
   return sendRequest(`${BASE_URL}/user`, 'GET');
 }
-
-export function checkToken() {
-  return sendRequest(`${BASE_URL}/user`);
-}

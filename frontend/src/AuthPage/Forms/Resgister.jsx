@@ -9,29 +9,31 @@ function Register(){
     email: '',
     password: '',
   });
-  
   const [error, setError] = useState('');
 
   function handleChange(evt) {
-  setCredentials({ ...credentials, [evt.target.name]: evt.target.value });
-  setError('');
+    setCredentials({ ...credentials, [evt.target.name]: evt.target.value });
+    setError('');
   }
 
   async function handleSubmit(evt) {
     evt.preventDefault();
-    try {
-      console.log('main register')
-      const user = await userService.register(credentials);
-      console.log(user)
+    try{
+      // register and retrieve user to set globally
+      let user = await userService.register(credentials);
+      const { name, ...loginUserObj } = credentials
+      user = await userService.login( loginUserObj );
       setUser(user);
-    } catch {
-      setError('Log In Failed');
+    }catch{
+      setError('Registration Failed');
     }
-
   }
 
-    return(
-        <>
+  return(
+    <>
+      <h5>
+        register
+      </h5>
       <div>
         <form autoComplete="off" onSubmit={handleSubmit}>
           <div>
@@ -50,9 +52,9 @@ function Register(){
           </div>
         </form>
       </div>
-      <p className="error-message">&nbsp;{credentials.error}</p>
-        </>
-    )
+      <p className="error-message">&nbsp;{error}</p>
+    </>
+  )
       
 
 }
