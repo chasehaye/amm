@@ -18,7 +18,7 @@ function Login() {
   async function handleSubmit(evt) {
     evt.preventDefault();
     try{
-      // retrieve user to set globally
+      // validate retrieve user to set globally
       const user = await userService.login(credentials);
       setUser(user);
     }catch{

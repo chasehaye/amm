@@ -20,9 +20,7 @@ function Register(){
     evt.preventDefault();
     try{
       // register and retrieve user to set globally
-      let user = await userService.register(credentials);
-      const { name, ...loginUserObj } = credentials
-      user = await userService.login( loginUserObj );
+      const user = await userService.register(credentials);
       setUser(user);
     }catch{
       setError('Registration Failed');

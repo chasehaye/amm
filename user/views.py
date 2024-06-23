@@ -10,15 +10,11 @@ import jwt, datetime
 class RegisterView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            print("Step 3: Validation failed")
-            print("Validation errors:", serializer.errors)
-            return Response(serializer.errors, status=400)
-
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        user = serializer.save()
+
         payload = {
+            'id': user.id,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
             'iat': datetime.datetime.utcnow()
         }
@@ -48,11 +44,9 @@ class LoginView(APIView):
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
             'iat': datetime.datetime.utcnow()
         }
-
         token = jwt.encode(payload, 'secret', algorithm='HS256')
 
         response = Response()
-
         response.set_cookie(key='jwt', value=token, httponly=True)
         response.data = {
             'jwt': token
@@ -66,13 +60,14 @@ class UserView(APIView):
         token = request.COOKIES.get('jwt')
         if not token:
             raise AuthenticationFailed('Unauthenticated')
-        
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Unauthenticated')
+        
         user = User.objects.filter(id=payload['id']).first()
         serializer = UserSerializer(user)
+
         return Response(serializer.data)
     
 class LogoutView(APIView):

@@ -2,11 +2,12 @@ import * as userAPI from './user-api';
 
 export async function register(userData) {
   // register a user
-    await userAPI.register(userData);
-  return null;
+   const token = await userAPI.register(userData);
+   localStorage.setItem('token', token.jwt);
+  return getUser();
 }
 
-export function getToken() {
+export async function getToken() {
   //grab token
   const token = localStorage.getItem('token');
   //validate token
@@ -34,17 +35,9 @@ export async function getUser() {
   }
 }
 
-export function logOut() {
+export async function logOut() {
   localStorage.removeItem('token');
 }
-
-// export async function login(credentials) {
-//   // login and set token in local storage
-//   const token = await userAPI.login(credentials);
-//   localStorage.setItem('token', token.jwt);
-//   return getUser();
-// }
-
 
 export async function login(credentials) {
   // login and set token in local storage
