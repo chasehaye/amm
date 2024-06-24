@@ -42,12 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api.apps.ApiConfig',
     'rest_framework',
     'corsheaders',
     'client.apps.ClientConfig',
     'user.apps.UserConfig',
-    'anime.apps.ApiConfig',
+    'anime.apps.AnimeConfig',
 ]
 
 MIDDLEWARE = [
