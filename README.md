@@ -49,9 +49,6 @@ sequel / prequel?
 status user?
 
 
-opening ending link
-
-
 Score: 8.921 (scored by 200,890 users) Ranked: #1822 based on the top anime page. Please note that 'Not yet aired' and 'R18+' titles are excluded.
 Popularity: #569
 Members: 404,709

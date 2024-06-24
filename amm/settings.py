@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'client.apps.ClientConfig',
-    'user.apps.UserConfig'
+    'user.apps.UserConfig',
+    'anime.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
