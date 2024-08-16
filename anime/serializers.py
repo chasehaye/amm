@@ -4,7 +4,7 @@ from .models import Anime
 class AnimeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Anime
-        fields = ['titleEnglish']
+        fields = ['id', 'titleEnglish']
 
     def create(self, validated_data):
         instance = self.Meta.model.objects.create(**validated_data)
