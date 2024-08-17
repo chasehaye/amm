@@ -1,11 +1,18 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import UserSerializer
-from .models import User
 import jwt, datetime
 
-# Create your views here.
+from .serializers import UserSerializer
+from .models import User
+
+
+from django.shortcuts import get_object_or_404
+from anime.models import Anime
+from anime.serializers import AnimeSerializer
+from amm.utils.token_util import validate_retrieve_user
+
+# UserViews
 
 class RegisterView(APIView):
     def post(self, request):
@@ -15,6 +22,7 @@ class RegisterView(APIView):
 
         payload = {
             'id': user.id,
+            'name': user.name,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
             'iat': datetime.datetime.utcnow()
         }
@@ -40,6 +48,7 @@ class LoginView(APIView):
         
         payload = {
             'id': user.id,
+            'name': user.name,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
             'iat': datetime.datetime.utcnow()
         }
@@ -77,4 +86,44 @@ class LogoutView(APIView):
             'message': 'success'
         }
         return response
+    
+
+
+#User Anime views
         
+class AnimeListLinkView(APIView):
+    def post (self, request, arr, id):
+
+        user = validate_retrieve_user(request)
+
+        list_types = {
+            0: 'currently_watching',
+            1: 'completed',
+            2: 'plan_to_watch',
+            3: 'dropped',
+            4: 'interested_in',
+            5: 'on_hold'
+        }
+
+        if arr not in list_types:
+            return Response({"error": "Invalid list type"}, status=400)
+        
+        list_type = list_types[arr]
+        anime = get_object_or_404(Anime, id=id)
+
+        for lt in list_types.values():
+            list_field = getattr(user, lt)
+            if anime in list_field.all():
+                list_field.remove(anime)
+
+        list_field = getattr(user, list_type)
+        list_field.add(anime)
+
+
+        return Response({
+            'message': f'Anime with ID {id} added to {list_type.replace("_", " ")} list.'
+        })
+    
+
+
+    

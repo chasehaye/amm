@@ -5,7 +5,7 @@ from anime.models import Anime
 
 # Create your models here.
 class User(AbstractUser):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     email = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     username = None
@@ -13,12 +13,12 @@ class User(AbstractUser):
 
 
 
-    currently_watching = models.ManyToManyField(Anime, related_name='currently_watched_by', blank=True)
-    completed = models.ManyToManyField(Anime, related_name='completed_by', blank=True)
-    plan_to_watch = models.ManyToManyField(Anime, related_name='planned_to_watch_by', blank=True)
-    dropped = models.ManyToManyField(Anime, related_name='dropped_by', blank=True)
-    interested_in = models.ManyToManyField(Anime, related_name='interested_by', blank=True)
-    on_hold = models.ManyToManyField(Anime, related_name='on_hold_by', blank=True)
+    currently_watching = models.ManyToManyField(Anime, related_name='currently_watching', blank=True)
+    completed = models.ManyToManyField(Anime, related_name='completed', blank=True)
+    plan_to_watch = models.ManyToManyField(Anime, related_name='planned_to_watch', blank=True)
+    dropped = models.ManyToManyField(Anime, related_name='dropped', blank=True)
+    interested_in = models.ManyToManyField(Anime, related_name='interested_in', blank=True)
+    on_hold = models.ManyToManyField(Anime, related_name='on_hold', blank=True)
 
 
 

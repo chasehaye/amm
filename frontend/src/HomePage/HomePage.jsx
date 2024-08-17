@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { UserContext } from '../UserProvider';
 import NavBar from '../NavBar/NavBar';
-import TestEnv from '../TestEnv/TestEnv';
+import AnimeList from '../AnimeList/AnimeLIst';
 
 function Home() {
 
@@ -17,7 +17,7 @@ function Home() {
             <div className='justify-center text-center'>
                 Start writing api calls to get user filtered anime list
             </div>
-            <TestEnv/>
+            <AnimeList/>
         </>
     );
 }
