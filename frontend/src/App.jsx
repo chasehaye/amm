@@ -1,13 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import './App.css';
 
 import { UserContext } from './UserProvider';
 import { getUser } from './utilities/user-service';
 
 import HomePage from './HomePage/HomePage';
 import AuthPage from './AuthPage/AuthPage';
-import ListPage from './ListPage/ListPage';
 
 function App() {
   const { user, setUser } = useContext(UserContext);
@@ -37,7 +35,6 @@ function App() {
       {user ? (
         <>
           <HomePage />
-          <ListPage />
         </>
       ) : (
         <AuthPage />

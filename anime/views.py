@@ -13,13 +13,15 @@ from amm.utils.token_util import validate_admin
 class CreateAnimeView(APIView):
     def post(self, request):
         try:
+            #validate admin
             user = validate_admin(request)
             if not user:
-                return Response({'error': 'You do not have permission to perform this action'}, status=status.HTTP_403_FORBIDDEN)
+                return Response({'error': 'You do not have permission'}, status=status.HTTP_403_FORBIDDEN)
             
             serializer = AnimeSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             anime = serializer.save()
+
             # Use payload as needed
             return Response({'message': 'success'})
         except AuthenticationFailed as e:
@@ -35,33 +37,36 @@ class FindAnimeView(APIView):
     def get(self, request, id):
         try:
             anime = Anime.objects.get(pk=id)
-            print(anime)
         except Anime.DoesNotExist:
-            raise NotFound(detail="Anime not found", code=404)
+            raise NotFound(detail="not found", code=404)
         serializer = AnimeSerializer(anime)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 class DeleteAnimeView(APIView):
     def delete(self, request, id):
         try:
+            #validate admin
             user = validate_admin(request)
             if not user:
-                return Response({'error': 'You do not have permission to perform this action'}, status=status.HTTP_403_FORBIDDEN)
+                return Response({'error': 'You do not have permission'}, status=status.HTTP_403_FORBIDDEN)
+            
             anime = Anime.objects.get(pk=id)
             anime.delete()
-            return Response({'message': 'Anime deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+            return Response({'message': 'deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
         except Anime.DoesNotExist:
-            raise NotFound(detail="Anime not found", code=404)
+            raise NotFound(detail="not found", code=404)
         
 class UpdateAnimeView(APIView):
     def put(self, request, id):
         try:
+            #validate admin
             user = validate_admin(request)
             if not user:
-                return Response({'error': 'You do not have permission to perform this action'}, status=status.HTTP_403_FORBIDDEN)
+                return Response({'error': 'You do not have permission'}, status=status.HTTP_403_FORBIDDEN)
+            
             anime = Anime.objects.get(pk=id)
         except Anime.DoesNotExist:
-            raise NotFound(detail="Anime not found", code=404)
+            raise NotFound(detail="not found", code=404)
         serializer = AnimeSerializer(anime, data=request.data)
         if serializer.is_valid():
             serializer.save()

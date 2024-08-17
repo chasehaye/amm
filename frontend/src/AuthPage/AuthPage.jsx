@@ -1,14 +1,26 @@
+import { useState } from "react"
 import Login from "./Forms/Login"
 import Register from "./Forms/Resgister"
 
 function AuthPage() {
 
+    const[showLogin, setShowLogin] = useState(true);
+
+    const toggleForm = () => {
+        setShowLogin(!showLogin);
+    }
+
     return(
         <>
-        <h1>AuthPage</h1>
-        <h1>Login Form</h1>
-            <Login />
+            <button onClick={toggleForm}>
+                {showLogin ? <p>Login</p> : <p> SignUp</p>}
+            </button>
+
+            {showLogin ? 
             <Register />
+            : 
+            <Login />
+            }
         </>
     )
 }

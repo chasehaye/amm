@@ -32,7 +32,6 @@ class LoginView(APIView):
     def post(self, request):
         email = request.data["email"]
         password = request.data["password"]
-
         user = User.objects.filter(email=email).first()
         if user is None:
             raise AuthenticationFailed("User not found")

@@ -1,5 +1,7 @@
 import React, { useContext } from 'react';
 import { UserContext } from '../UserProvider';
+import NavBar from '../NavBar/NavBar';
+import TestEnv from '../TestEnv/TestEnv';
 
 function Home() {
 
@@ -7,11 +9,15 @@ function Home() {
 
     return (
         <>
-            <h1>Home Page</h1>
-            <div>
-                <p>The user is globally accesible below:</p>
-                <p> {user ? user.name : 'No user logged in'}</p>
+            <NavBar/>
+            <div className='justify-center text-center'>Home Page</div>
+            <div className='justify-center text-center'>
+                Start writing backend logic for api calls
             </div>
+            <div className='justify-center text-center'>
+                Start writing api calls to get user filtered anime list
+            </div>
+            <TestEnv/>
         </>
     );
 }
