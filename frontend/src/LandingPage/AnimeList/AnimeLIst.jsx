@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { index } from '../utilities/anime-api';
+import { index } from '../../utilities/anime-api';
 
 function AnimeList() {
 
@@ -65,4 +65,4 @@ function AnimeList() {
     )
 }
 
-export default AnimeList
+export default AnimeList;

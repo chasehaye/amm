@@ -6,6 +6,7 @@ import { getUser } from './utilities/user-service';
 
 import HomePage from './HomePage/HomePage';
 import AuthPage from './AuthPage/AuthPage';
+import LandingPage from './LandingPage/LandingPage';
 
 function App() {
   const { user, setUser } = useContext(UserContext);
@@ -33,11 +34,22 @@ function App() {
   return (
     <main>
       {user ? (
+        // has user
         <>
-          <HomePage />
+        <Routes>
+          <Route path='/' element={<HomePage />}></Route>
+
+        </Routes>
         </>
       ) : (
-        <AuthPage />
+        // user is null
+        <>
+          <Routes>
+          <Route path='/auth' element={<AuthPage />}></Route>
+          <Route path='/' element={<LandingPage />}></Route>
+          
+          </Routes>
+        </>
       )}
     </main>
   );

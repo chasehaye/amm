@@ -2,7 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
 html {
-  background-color: black;
-  color: whitesmoke;
+  background-color: #1e1e1e;
+  color: black;
+  font-family: "Roboto", system-ui;
 }

@@ -1,26 +1,42 @@
 import { useState } from "react"
 import Login from "./Forms/Login"
 import Register from "./Forms/Resgister"
+import { useNavigate } from "react-router-dom";
 
 function AuthPage() {
 
     const[showLogin, setShowLogin] = useState(true);
+    const navigate = useNavigate();
 
     const toggleForm = () => {
         setShowLogin(!showLogin);
     }
 
+    const navigateBack = () => {
+        navigate('/');
+    }
+
     return(
         <>
-            <button onClick={toggleForm}>
-                {showLogin ? <p>Login</p> : <p> SignUp</p>}
-            </button>
+            <div className="h-32 flex justify-between items-center px-5">
 
-            {showLogin ? 
-            <Register />
-            : 
-            <Login />
-            }
+                <button onClick={toggleForm} className="bg-slate-50 rounded-md px-2 py-1 mt-4">
+                    {showLogin ? <p className="text-red-800">SignUp</p> : <p className="text-red-800">Login</p>}
+                </button>
+                <button onClick={navigateBack} className="bg-slate-50 rounded-md px-2 py-1 mt-4">
+                <p className="text-red-800">Return</p>
+                </button>
+
+            </div>
+            <div className="">
+
+                {showLogin ? 
+                    <Login />
+                : 
+                    <Register />
+                }
+
+            </div>
         </>
     )
 }
