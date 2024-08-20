@@ -1,6 +1,6 @@
 import { useState } from "react"
-import Login from "./Forms/Login"
-import Register from "./Forms/Resgister"
+import Login from "./AuthForms/Login"
+import Register from "./AuthForms/Resgister"
 import { useNavigate } from "react-router-dom";
 
 function AuthPage() {

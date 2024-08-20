@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { index } from '../../utilities/anime-api';
+import Anime from '../../Components/Anime/Anime';
 
 function AnimeList() {
 
@@ -8,10 +9,13 @@ function AnimeList() {
     useEffect(() => {
         async function fetchAnime() {
             try {
-                const data = await index();
-                setAnimeList(data);
+                const anime = await index();
+                const mappedAnime = anime.map(anime => (
+                    <Anime key={anime.id} anime={anime} />
+                ))
+                setAnimeList(mappedAnime);
             } catch (err) {
-                console.error("Failed to fetch Anime List", error);
+                console.error("Failed to fetch Anime List", err);
             }
         }
 
@@ -20,44 +24,10 @@ function AnimeList() {
 
     return(
         <>
-            <div className="w-[80vw] h-screen justify-center items-center bg-gray-900 mx-auto">
-                <div className="text-center top-0 text-red-500">
-                    Test block
-                </div>
-
-
-
-
-
-
-
-
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {animeList.length > 0 ? (
-                    animeList.map((anime) => (
-                        <div key={anime.id} className="bg-gray-800 p-4 rounded-lg shadow-md">
-                            <h3 className="text-white text-lg mb-2">{anime.titleEnglish}</h3>
-                            <p>{anime.id}</p>
-                        </div>
-                    ))
-                ) : (
-                    <p className="text-white">Loading...</p>
-                )}
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            <div className="pt-10 h-screen justify-center items-center mx-auto bg-gray-400">
+                
+                
+                {animeList}
 
                 
             </div>

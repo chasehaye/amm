@@ -2,10 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-
+:root {
+  --c1: #1e1e1e;
+  --c2: #121019;
+  --c3: #fd0000;
+  --c4: white;
+  --c5: #1e1e1e;
+  --c6: #1e1e1e;
+}
 
 html {
-  background-color: #1e1e1e;
+  background-color: var(--c4);
   color: black;
   font-family: "Roboto", system-ui;
 }
