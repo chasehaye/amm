@@ -45,3 +45,13 @@ export async function login(credentials) {
   localStorage.setItem('token', token.jwt);
   return getUser();
 }
+
+export async function adminVerify(){
+  try {
+    const adminStatus = await userAPI.adminVerify();
+    return adminStatus;
+  } catch (err) {
+    console.error('Error fetching user:', err);
+    return false;
+  }
+}
