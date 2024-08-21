@@ -2,17 +2,22 @@ import { useState, useEffect, useContext } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import { UserContext } from './UserProvider';
-import { getUser } from './utilities/user-service';
+import { getUser, adminVerify } from './utilities/user-service';
 
-import HomePage from './HomePage/HomePage';
+import HomePage from './UserPages/HomePage/HomePage';
 import AuthPage from './AuthPage/AuthPage';
-import LandingPage from './LandingPage/LandingPage';
+import LandingPage from './AllPages/LandingPage/LandingPage';
+import AdminHomePage from './AdminPages/AdminHome/AdminHome';
+import AddAnimePage from './AdminPages/AddAnimePage/AddAnimePage';
 
 function App() {
   const { user, setUser } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
+  const [admin, setAdmin] = useState(null);
 
   useEffect(() => {
+
+
     const fetchUser = async () => {
       try {
         const userData = await getUser();
@@ -24,7 +29,19 @@ function App() {
       }
     };
 
+
+    const fetchAdminStatus = async () => {
+      try {
+          const adminStatus = await adminVerify();
+          setAdmin(adminStatus)
+      } catch (err) {
+          setAdmin(false)
+      } 
+  }
+
+
     fetchUser();
+    fetchAdminStatus();
   }, [setUser]);
 
   if (loading) {
@@ -34,20 +51,25 @@ function App() {
   return (
     <main>
       {user ? (
-        // has user
         <>
-        <Routes>
-          <Route path='/' element={<HomePage />}></Route>
-
-        </Routes>
+          {/* User routes */}
+          <Routes>
+            <Route path='/' element={<HomePage />}></Route>
+            {admin && (
+              <>
+                {/* Admin routes */}
+                <Route path='/admin/home' element={<AdminHomePage />} />
+                <Route path='/admin/anime/add' element={<AddAnimePage />} />
+              </>
+            )}
+          </Routes>
         </>
       ) : (
-        // user is null
         <>
+          {/* Null routes */}
           <Routes>
-          <Route path='/auth' element={<AuthPage />}></Route>
-          <Route path='/' element={<LandingPage />}></Route>
-          
+            <Route path='/auth' element={<AuthPage />}></Route>
+            <Route path='/' element={<LandingPage />}></Route>
           </Routes>
         </>
       )}

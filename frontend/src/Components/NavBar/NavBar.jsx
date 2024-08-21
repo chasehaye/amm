@@ -1,16 +1,44 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { UserContext } from '../../UserProvider';
 import './NavBar.css';
 import { Link } from "react-router-dom";
+import { adminVerify } from "../../utilities/user-api";
 
 function NavBar() {
     const { user } = useContext(UserContext);
+    const [admin, setAdmin] = useState(null);
 
-    return(
+    useEffect(() => {
+        const fecthAdminStatus = async () => {
+            try {
+                const adminStatus = await adminVerify();
+                setAdmin(adminStatus)
+            } catch (err) {
+                console.log(err)
+                setAdmin(false)
+            } 
+        }
+        fecthAdminStatus();
+    }, [])
+
+    return (
         <>
-            <div className="font-bold border border-black inline-block m-4">
-                AMM
-            </div>
+            {admin === null ? (
+                null
+            ) : admin ? (
+                <div>
+                    <div className="font-bold border border-black inline-block m-4">
+                        Admin
+                    </div>
+                    <Link className="font-bold border border-black inline-block m-4" to="/admin/home">
+                        Menu
+                    </Link>
+                </div>
+            ) : (
+                <div className="font-bold border border-black inline-block m-4">
+                    AMM
+                </div>
+            )}
 
             <div className="mt-10 flex w-full nav_w">
                 <Link className="p-2 text-center flex-1 cursor-pointer hover:font-bold relative" to="/a">
@@ -68,4 +96,4 @@ function NavBar() {
     )
 }
 
-export default NavBar
+export default NavBar;

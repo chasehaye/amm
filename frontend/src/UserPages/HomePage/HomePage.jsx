@@ -1,8 +1,7 @@
 import React, { useContext } from 'react';
-import { UserContext } from '../UserProvider';
-import NavBar from '../Components/NavBar/NavBar';
-import AnimeList from '../LandingPage/AnimeList/AnimeLIst';
-import AdminNav from '../Components/AdminNav/AdminNav';
+import { UserContext } from '../../UserProvider';
+import NavBar from '../../Components/NavBar/NavBar';
+import AnimeList from '../../AllPages/LandingPage/AnimeList/AnimeLIst';
 
 function Home() {
 
@@ -19,7 +18,6 @@ function Home() {
                 Start writing api calls to get user filtered anime list
             </div>
             <AnimeList/>
-            <AdminNav />
         </>
     );
 }
