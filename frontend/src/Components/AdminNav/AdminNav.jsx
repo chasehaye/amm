@@ -25,7 +25,7 @@ function AdminNav() {
     }
     return(
     <>
-    <div className="fixed bottom-0 w-full flex">
+    <div className="top-0 w-full flex">
         <Link className="cursor-pointer flex-1 text-center bg-black text-white" to="/admin/anime/add">Add Anime</Link>
         <div className="cursor-pointer flex-1 text-center bg-black text-white">2</div>
         <div className="cursor-pointer flex-1 text-center bg-black text-white">3</div>

@@ -4,11 +4,12 @@ import { Routes, Route } from 'react-router-dom';
 import { UserContext } from './UserProvider';
 import { getUser, adminVerify } from './utilities/user-service';
 
-import HomePage from './UserPages/HomePage/HomePage';
+import HomePage from './HomePage/HomePage';
 import AuthPage from './AuthPage/AuthPage';
-import LandingPage from './AllPages/LandingPage/LandingPage';
-import AdminHomePage from './AdminPages/AdminHome/AdminHome';
-import AddAnimePage from './AdminPages/AddAnimePage/AddAnimePage';
+import LandingPage from './LandingPage/LandingPage';
+import AdminHomePage from './AdminHome/AdminHome';
+import AddAnimePage from './AddAnimePage/AddAnimePage';
+import AnimeItemPage from './AnimeDetailPage/AnimeDetailPage';
 
 function App() {
   const { user, setUser } = useContext(UserContext);
@@ -60,6 +61,7 @@ function App() {
                 {/* Admin routes */}
                 <Route path='/admin/home' element={<AdminHomePage />} />
                 <Route path='/admin/anime/add' element={<AddAnimePage />} />
+                <Route path='/anime/:animeId' element={<AnimeItemPage />}></Route>
               </>
             )}
           </Routes>
@@ -70,6 +72,7 @@ function App() {
           <Routes>
             <Route path='/auth' element={<AuthPage />}></Route>
             <Route path='/' element={<LandingPage />}></Route>
+            <Route path='/anime/:animeId' element={<AnimeItemPage />}></Route>
           </Routes>
         </>
       )}

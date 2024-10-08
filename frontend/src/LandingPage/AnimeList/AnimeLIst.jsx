@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { index } from '../../../utilities/anime-api';
-import Anime from '../../../Components/AnimeItem/AnimeItem';
+import { index } from '../../utilities/anime-api';
+import Anime from '../../Components/AnimeItem/AnimeItem';
 
 function AnimeList() {
 

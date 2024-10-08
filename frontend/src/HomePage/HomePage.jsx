@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
-import { UserContext } from '../../UserProvider';
-import NavBar from '../../Components/NavBar/NavBar';
-import AnimeList from '../../AllPages/LandingPage/AnimeList/AnimeLIst';
+import { UserContext } from '../UserProvider';
+import NavBar from '../Components/NavBar/NavBar';
+import AnimeList from '../LandingPage/AnimeList/AnimeLIst';
 
 function Home() {
 

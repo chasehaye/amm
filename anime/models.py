@@ -1,8 +1,6 @@
 from django.db import models
 
-import jwt
 from django.conf import settings
-from rest_framework.exceptions import AuthenticationFailed
 
 #field inputs for anime model
 def generate_seasons(start_year=1970, end_year=2070):
@@ -13,11 +11,11 @@ SEASONS = generate_seasons()
 # Create your models here.
 
 class Anime(models.Model):
-    titleEnglish = models.CharField(unique=True)
-    # titleJpRoman = models.CharField(unique=True)
-    # titleJpKanj = models.CharField(unique=True)
+    titleEnglish = models.CharField(max_length=255, unique=True)
+    titleJpRoman = models.CharField(max_length=255, unique=True, null=True)
+    titleJpKanji = models.CharField(max_length=255, unique=True, null=True)
 
-    # description = models.CharField(unique=True)
+    description = models.CharField(max_length=255, unique=True, null=True)
 
     # prequel = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='sequel_anime', null=True, blank=True)
     # sequel = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='prequel_anime', null=True, blank=True)
@@ -34,18 +32,6 @@ class Anime(models.Model):
     # premireSeason = models.CharField(max_length=20, choices=SEASONS)
     # airDate = models.DateField(null=True, blank=True)
     # endDate = models.DateField(null=True, blank=True)
-
-
-
-
-
-
-
-
-
-
-
-    
 
     #rating
     #watched episodes
