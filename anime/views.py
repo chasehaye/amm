@@ -1,9 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.exceptions import AuthenticationFailed, NotFound
+from rest_framework.exceptions import AuthenticationFailed, NotFound, ValidationError
 from .serializers import AnimeSerializer
-from .models import Anime
+from .models import Anime, Season
 import jwt
 from django.conf import settings
 from datetime import datetime, timedelta
@@ -24,6 +24,8 @@ class CreateAnimeView(APIView):
 
             # Use payload as needed
             return Response({'message': 'success'})
+        except ValidationError as e:
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
         except AuthenticationFailed as e:
             return Response({'error': str(e)}, status=401)
         
@@ -52,7 +54,7 @@ class DeleteAnimeView(APIView):
             
             anime = Anime.objects.get(pk=id)
             anime.delete()
-            return Response({'message': 'deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+            return Response({'message': 'success'}, status=status.HTTP_200_OK)
         except Anime.DoesNotExist:
             raise NotFound(detail="not found", code=404)
         

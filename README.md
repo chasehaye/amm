@@ -1,3 +1,46 @@
+# All Backend APi calls
+    User Resftul
+    path('register', RegisterView.as_view()),
+    payload -- name email password
+
+    path('login', LoginView.as_view()),
+    paylaod -- email password
+
+    path('user', UserView.as_view()),
+    payload -- none
+
+    path('logout', LogoutView.as_view()),
+    payload -- none
+
+    path('admin', PermissionView.as_view()),
+    payload -- none
+
+    Anime restful
+    path('create', CreateAnimeView.as_view()),
+    payload -- list of anime data
+
+    path('index', IndexAnimeView.as_view()),
+    paylaod -- none
+
+    path('<int:id>', FindAnimeView.as_view()),
+    payload -- none
+
+    path('<int:id>/delete', DeleteAnimeView.as_view()),
+    payload -- none
+
+    path('<int:id>/update', UpdateAnimeView.as_view()),
+    payload -- list of anime data
+
+    Rating based views
+    path('<int:userId>/rate/<int:animeId>', UserAnimeRatingView.as_view()),
+    payload -- score: 1-10
+
+
+
+
+
+# unfinished
+    path('link/<int:arr>/<str:id>', AnimeListLinkView.as_view())
 # navigate to run:
 python manage.py runserver
 npm run start

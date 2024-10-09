@@ -8,7 +8,7 @@ from .models import User
 
 
 from django.shortcuts import get_object_or_404
-from anime.models import Anime
+from anime.models import Anime, Rating
 from anime.serializers import AnimeSerializer
 from amm.utils.token_util import validate_retrieve_user
 
@@ -103,7 +103,50 @@ class PermissionView(APIView):
         else:
             return Response(False)
 
-    
+#User Anime rating view
+class UserAnimeRatingView(APIView):
+    def post(self, request, userId, animeId):
+        # Retrieve the user by userId
+        user = get_object_or_404(User, id=userId)
+        anime = get_object_or_404(Anime, id=animeId)
+        score = request.data.get('score')
+        if score is None:
+            return Response({"error": "Score is required."}, status=400)
+        # Validate score range (assuming a rating scale from 1 to 10)
+        if not isinstance(score, int) or score < 1 or score > 10:
+            return Response({"error": "Score must be an integer between 1 and 10."}, status=400)
+        # Check if a rating already exists and update or create it
+        rating, created = Rating.objects.update_or_create(
+            user=user,
+            anime=anime,
+            defaults={'score': score}
+        )
+        if created:
+            return Response({"message": f"Rating of {score} added for anime '{anime.titleEnglish}'."})
+        else:
+            return Response({"message": f"Rating updated to {score} for anime '{anime.titleEnglish}'."})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #User Anime views

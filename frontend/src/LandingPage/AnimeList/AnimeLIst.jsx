@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { index } from '../../utilities/anime-api';
-import Anime from '../../Components/AnimeItem/AnimeItem';
+import AnimeItem from '../../Components/AnimeItem/AnimeItem';
 
 function AnimeList() {
 
@@ -11,7 +11,7 @@ function AnimeList() {
             try {
                 const anime = await index();
                 const mappedAnime = anime.map(anime => (
-                    <Anime key={anime.id} anime={anime} />
+                    <AnimeItem key={anime.id} anime={anime} />
                 ))
                 setAnimeList(mappedAnime);
             } catch (err) {
@@ -21,6 +21,10 @@ function AnimeList() {
 
         fetchAnime();
     }, []);
+
+    async function handleDelete(e){
+        // const deleteResponse
+    }
 
     return(
         <>

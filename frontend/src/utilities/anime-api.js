@@ -10,6 +10,9 @@ export function createNewAnime(animeData){
 }
 
 export function getAnimeRequest(animeId){
-    console.log(animeId + "request ID")
     return sendRequest(`${BASE_URL}/${animeId}`, 'GET');
+}
+
+export function deleteAnimeRequest(animeId){
+    return sendRequest(`${BASE_URL}/${animeId}/delete`, 'DELETE');
 }
