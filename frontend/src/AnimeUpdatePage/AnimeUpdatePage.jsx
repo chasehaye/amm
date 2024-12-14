@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getAnimeRequest, deleteAnimeRequest } from "../utilities/anime-api";
-import AnimeItemDetail from "../Components/AnimeItemDetail/AnimeItemDetail";
+import AnimeUpdate from "../Components/AnimeUpdate/AnimeUpdate";
 
 function AnimeItemPage() {
     let { animeId } = useParams();
@@ -35,7 +35,7 @@ function AnimeItemPage() {
         try{
             const deleteResponse = await deleteAnimeRequest(anime.id);
             if(deleteResponse.message === 'success'){
-                navigate('/')
+                navigate('/admin/home')
             }
         }catch(error){
             console.log(error);
@@ -51,12 +51,10 @@ function AnimeItemPage() {
                 <p>{error}</p>
             :
             <div>
-                <AnimeItemDetail anime={anime} setAnime={setAnime}/>
-                <div className="mx-auto" onClick={handleDelete}>
-                    <button className="bg-red-500 text-black py-1 px-6 rounded text-sm hover:bg-C8 mt-2 h-10 font-bold">delete</button>
-                </div>
-                <div>
-                    ADD UPDATE PAGE
+                <h1 class="mt-4 flex justify-center mb-8 border-b border-c4 w-40 mx-auto pb-2">Update Anime</h1>
+                <AnimeUpdate anime={anime} setAnime={setAnime}/>
+                <div className="w-full flex justify-end mt-10 mr-10" onClick={handleDelete}>
+                    <button className="mb-10 py-1 px-6 border border-c4 text-sm hover:bg-c2 mt-2 h-10 mr-40">Delete</button>
                 </div>
             </div>
             }

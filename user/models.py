@@ -13,10 +13,6 @@ class User(AbstractUser):
 
 
 
-
-
-
-# unfinihsed
     currently_watching = models.ManyToManyField(Anime, related_name='currently_watching', blank=True)
     completed = models.ManyToManyField(Anime, related_name='completed', blank=True)
     plan_to_watch = models.ManyToManyField(Anime, related_name='planned_to_watch', blank=True)

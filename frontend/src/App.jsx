@@ -9,44 +9,19 @@ import AuthPage from './AuthPage/AuthPage';
 import LandingPage from './LandingPage/LandingPage';
 import AdminHomePage from './AdminHome/AdminHome';
 import AddAnimePage from './AddAnimePage/AddAnimePage';
-import AnimeItemPage from './AnimeDetailPage/AnimeDetailPage';
+import AnimeUpdatePage from './AnimeUpdatePage/AnimeUpdatePage';
+import AddGenrePage from './AddGenrePage/AddGenrePage';
+import AddStudioPage from './AddStudioPage/AddStudioPage';
+import ProfilePage from './ProfilePage/ProfilePage';
+import AnimeItemDetailPage from './AnimeItemDetailPage/AnimeItemDetailPage';
+import UserAnimePage from './UserAnimePage/UserAnimePage';
+import UserMangaPage from './UserMangaPage/UserMangaPage';
 
 function App() {
-  const { user, setUser } = useContext(UserContext);
-  const [loading, setLoading] = useState(true);
-  const [admin, setAdmin] = useState(null);
-
-  useEffect(() => {
-
-
-    const fetchUser = async () => {
-      try {
-        const userData = await getUser();
-        setUser(userData);
-      } catch (error) {
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-
-    const fetchAdminStatus = async () => {
-      try {
-          const adminStatus = await adminVerify();
-          setAdmin(adminStatus)
-      } catch (err) {
-          setAdmin(false)
-      } 
-  }
-
-
-    fetchUser();
-    fetchAdminStatus();
-  }, [setUser]);
+  const { user, admin, loading } = useContext(UserContext);
 
   if (loading) {
-    return <main></main>;
+    return <div>Loading...</div>;
   }
 
   return (
@@ -56,12 +31,24 @@ function App() {
           {/* User routes */}
           <Routes>
             <Route path='/' element={<HomePage />}></Route>
-            {admin && (
+            <Route path='/profile' element={<ProfilePage />}></Route>
+            <Route path='animeList/:username' element={<UserAnimePage/>} />
+            <Route path='mangaList/:username' element={<UserMangaPage/>} />
+            {admin ? (
               <>
-                {/* Admin routes */}
+                {/* Admin Routes */}
                 <Route path='/admin/home' element={<AdminHomePage />} />
                 <Route path='/admin/anime/add' element={<AddAnimePage />} />
-                <Route path='/anime/:animeId' element={<AnimeItemPage />}></Route>
+                <Route path='/anime/:animeId' element={<AnimeUpdatePage />} />
+                <Route path='/anime/:animeId/base' element={<AnimeItemDetailPage />} />
+                <Route path='/admin/genre/add' element={<AddGenrePage />} />
+                <Route path='/admin/studio/add' element={<AddStudioPage />} />
+                <Route path='/null/user/admin' element={<LandingPage />} />
+              </>
+            ) : (
+              <>
+                {/* Non-Admin User Routes */}
+                <Route path='/anime/:animeId' element={<AnimeItemDetailPage />} />
               </>
             )}
           </Routes>
@@ -72,7 +59,7 @@ function App() {
           <Routes>
             <Route path='/auth' element={<AuthPage />}></Route>
             <Route path='/' element={<LandingPage />}></Route>
-            <Route path='/anime/:animeId' element={<AnimeItemPage />}></Route>
+            <Route path='/anime/:animeId' element={<AnimeItemDetailPage />}></Route>
           </Routes>
         </>
       )}

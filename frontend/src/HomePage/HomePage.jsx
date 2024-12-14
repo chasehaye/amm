@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { UserContext } from '../UserProvider';
 import NavBar from '../Components/NavBar/NavBar';
-import AnimeList from '../LandingPage/AnimeList/AnimeLIst';
 
 function Home() {
 
@@ -10,14 +9,9 @@ function Home() {
     return (
         <>
             <NavBar/>
-            <div className='justify-center text-center'>Home Page</div>
-            <div className='justify-center text-center'>
-                Start writing backend logic for api calls
+            <div className="flex justify-center items-center w-full">
+                landing - {user.name}
             </div>
-            <div className='justify-center text-center'>
-                Start writing api calls to get user filtered anime list
-            </div>
-            <AnimeList/>
         </>
     );
 }

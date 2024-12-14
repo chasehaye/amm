@@ -1,12 +1,13 @@
 import React from 'react';
-import AnimeList from './AnimeList/AnimeLIst';
 import NavBar from '../Components/NavBar/NavBar';
 
 function LandingPage() {
     return (
         <>
             <NavBar />
-            <AnimeList />
+            <div className="flex justify-center items-center w-full">
+                landing no user
+            </div>
         </>
     )
 

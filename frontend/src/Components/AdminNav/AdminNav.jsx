@@ -1,37 +1,28 @@
 import React, { useContext, useEffect, useState } from "react";
-import { adminVerify } from "../../utilities/user-service";
 import { Link } from "react-router-dom";
+import { UserContext } from "../../UserProvider";
 
 function AdminNav() {
-    const [admin, setAdmin] = useState(null);
-
-    useEffect(() => {
-        const fetchAdminStatus = async () => {
-            try {
-                const adminStatus = await adminVerify();
-                setAdmin(adminStatus)
-            } catch (err) {
-                setAdmin(false)
-            } 
-        }
-        fetchAdminStatus();
-    }, [])
+    const { admin, user } = useContext(UserContext);
 
     
+    if (admin === null) return null;
+    if (admin === false) return null;
 
-
-    if (admin === false){
-        return null;
-    }
     return(
     <>
-    <div className="top-0 w-full flex">
-        <Link className="cursor-pointer flex-1 text-center bg-black text-white" to="/admin/anime/add">Add Anime</Link>
-        <div className="cursor-pointer flex-1 text-center bg-black text-white">2</div>
-        <div className="cursor-pointer flex-1 text-center bg-black text-white">3</div>
-        <div className="cursor-pointer flex-1 text-center bg-black text-white">4</div>
-        <div className="cursor-pointer flex-1 text-center bg-black text-white">
-            Admin Status: {admin !== null ? admin.toString() : "Loading..."}
+    <div className="top-0 w-full flex h-[6vh] mb-10">
+        <Link className="cursor-pointer flex-1 text-center leading-[6vh] border-c4 border-b hover:text-c2" to="/admin/anime/add">Add Anime</Link>
+        <Link className="cursor-pointer flex-1 text-center leading-[6vh] border-c4 border-l border-b hover:text-c2" to="/admin/genre/add">Add Genre</Link>
+        <Link className="cursor-pointer flex-1 text-center leading-[6vh] border-c4 border-l border-b hover:text-c2" to="/admin/studio/add">Add Studio</Link>
+        <div className="flex-1 text-center leading-[6vh] border-c4 border-l border-b">Admin - {user.name}</div>
+        <div className="flex-1 leading-[6vh] border-b border-l border-c4">
+            <div className="flex text-center border-c4 border-b hover:text-c2">
+                <Link className="w-full cursor-pointer text-center leading-[3vh]" to="/">Leave Admin Panel</Link>
+            </div>
+            <div className="flex text-center border-c4 hover:text-c2">
+                <Link className="w-full cursor-pointer text-center leading-[3vh]" to="/null/user/admin">Non-User View</Link>
+            </div>
         </div>
     </div>
     </>

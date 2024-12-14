@@ -3,26 +3,34 @@ from django.db import models
 
 from django.conf import settings
 
-# fields for main model
-GENRE_CHOICES = [
-('Action', 'Action'),
-('Adventure', 'Adventure'),
-('Comedy', 'Comedy'),
-('Drama', 'Drama'),
-('Fantasy', 'Fantasy'),
-('Horror', 'Horror'),
-('Romance', 'Romance'),
-('Sci-Fi', 'Sci-Fi')
-]
-
 DEMOGRAPHIC = [
-    ('Shonen', 'Shonen'),
+    ('Shounen', 'Shounen'),
     ('Seinen', 'Seinen'),
-    ('Shojo', 'Shojo')
+    ('Shoujo', 'Shoujo'),
+    ('Josei', 'Josei')
+]
+
+TYPES = [
+    ('TV', 'TV'),
+    ('Movie', 'Movie'),
+    ('OVA', 'OVA')
 ]
 
 
-# sub models
+# genre model
+class Genre(models.Model):
+    name = models.CharField(max_length=25, unique=True)
+
+    def __str__(self):
+        return self.name
+
+# studio model
+class Studio(models.Model):
+    name = models.CharField(max_length=30, unique=True)
+    establishedDate = models.DateField(null=True, blank=True)
+    website = models.CharField(max_length=50, unique=True, blank=True)
+
+# season model
 class Season(models.Model):
     year = models.IntegerField()
     season = models.CharField(max_length=20, choices=[
@@ -38,51 +46,54 @@ class Season(models.Model):
     def __str__(self):
         return f"{self.season} {self.year}"
     
-# finish
+# rating model
 class Rating(models.Model):
     user = models.ForeignKey('user.User', on_delete=models.CASCADE)
-    anime = models.ForeignKey('Anime', on_delete=models.CASCADE)
+    anime = models.ForeignKey('Anime', on_delete=models.CASCADE, related_name='ratings')
     score = models.IntegerField()
+
     class Meta:
         unique_together = ('user', 'anime')
+
     def save(self, *args, **kwargs):
         anime = self.anime
-        if self.pk is None:  # Only if it's a new rating
+        if self.pk is None:  # If it's a new rating
             anime.rating_count += 1
             anime.total_rating += self.score
-            anime.update_aggregate_rating()
+        else:  # If it's an update to an existing rating
+            old_rating = Rating.objects.get(pk=self.pk)
+            anime.total_rating = anime.total_rating - old_rating.score
+            anime.total_rating += self.score
 
         super().save(*args, **kwargs)
-#  finish
+        anime.save()
+        anime.update_aggregate_rating()
+        anime.save()
 
 # Main Model
 class Anime(models.Model):
-
-
-    titleEnglish = models.CharField(max_length=255, unique=True)
-    titleJpRoman = models.CharField(max_length=255, unique=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) 
+    titleEnglish = models.CharField(max_length=255, unique=True, null=True)
+    titleJpRoman = models.CharField(max_length=255, unique=True,)
     titleJpKanji = models.CharField(max_length=255, unique=True, null=True)
-
-    description = models.CharField(max_length=255, unique=True, null=True)
-
-    episodes = models.IntegerField()
-    episodeDuration = models.IntegerField()
-    
+    description = models.CharField(max_length=1000, unique=True, null=True)
+    image = models.ImageField(upload_to='anime_images/', null=True, blank=True)
+    type = models.CharField(choices=TYPES, null=True)
+    episodes = models.IntegerField(null=True)
+    episodeDuration = models.IntegerField(null=True)
     premiereSeason = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True, blank=True)
-    genre = models.CharField(max_length=20, choices=GENRE_CHOICES)
-
+    genre = models.ManyToManyField(Genre)
     prequel = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='prequel_anime', null=True, blank=True)
     sequel = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='sequel_anime', null=True, blank=True)
-
-    demographic = models.CharField(max_length=20, choices=DEMOGRAPHIC)
-
+    demographic = models.CharField(max_length=20, choices=DEMOGRAPHIC, null=True)
     # YYYY-MM-DD
     airDate = models.DateField(null=True, blank=True)
     endDate = models.DateField(null=True, blank=True)
-
     rating_count = models.IntegerField(default=0)
-    total_rating = models.IntegerField(default=0)
+    total_rating = models.BigIntegerField(default=0)
     aggregateRating = models.FloatField(default=0)
+    studio = models.ForeignKey(Studio, on_delete=models.SET_NULL, null=True, blank=True)
 
     def update_aggregate_rating(self):
         if self.rating_count > 0:
@@ -92,17 +103,32 @@ class Anime(models.Model):
         self.save()
 
 
-    #rating
-    #watched episodes
-    #rating by user
-    #global rating
-    #review by user
 
-    #studio that made the anime model
+
+
+
+
+
+
+
+
+
+
+    
+
+    ### user based relations below ###
+    #watched episodes
+    #review by user
+    #favorite anime function
+
+    ### manga based relations below ###
+    #manga link? consider putting characters under the manga model
+    #characters? consider under manga
+    #authors? under manga model
     #Source material should link to a written manga model
-    #img that links to something like aws
+
     #number of users that have added the anime to their list
-    #rank based on where it compares to other aniem ratings
-    #user favorites feature
+    #rank based on where it compares to other anime ratings ?
+    #user favorites feature ? under
     def __str__(self):
-        return self.titleEnglish
+        return self.titleJpRoman

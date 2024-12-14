@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import AdminNav from "../Components/AdminNav/AdminNav";
+import AnimeList from "../Components/AdminList/AdminList";
 
 function AdminHomePage() {
-    const [loading, setLoading] = useState(true)
+
+    
 
     return(
         <>
             <AdminNav />
-            <h1>Admin home page</h1>
+            <AnimeList />
+            
         </>
     )
 

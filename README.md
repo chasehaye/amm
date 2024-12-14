@@ -35,6 +35,8 @@
     path('<int:userId>/rate/<int:animeId>', UserAnimeRatingView.as_view()),
     payload -- score: 1-10
 
+# still need to add a call to retrieve user rating
+# reviews for each anime seperate model?
 
 
 
@@ -110,3 +112,5 @@ img?
 
 
 notifications for air dates and end dates?
+link format
+[test](https://test.com)

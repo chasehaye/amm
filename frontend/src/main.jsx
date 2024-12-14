@@ -6,6 +6,7 @@ import { UserProvider } from './UserProvider.jsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
+  // COMMENT BACK IN LATER
   <React.StrictMode>
     <UserProvider>
       <Router>

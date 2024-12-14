@@ -3,21 +3,21 @@ import * as userAPI from './user-api';
 export async function register(userData) {
   // register a user
    const token = await userAPI.register(userData);
-   localStorage.setItem('token', token.jwt);
+   //localStorage.setItem('token', token.jwt);
   return getUser();
 }
 
 export async function getToken() {
   //grab token
-  const token = localStorage.getItem('token');
+  const token = getCookie('jwt');
   //validate token
   if (!token) return null;
   // pull token exp
   const payload = JSON.parse(atob(token.split('.')[1]));
   //validate exp
   if (payload.exp < Date.now() / 1000) {
-    // iff not valid remove token
-    localStorage.removeItem('token');
+    // if not valid remove token
+    removeCookie('jwt');
     return null;
   }
   // if is valid return
@@ -36,13 +36,11 @@ export async function getUser() {
 }
 
 export async function logOut() {
-  localStorage.removeItem('token');
+  removeCookie('jwt')
 }
 
 export async function login(credentials) {
-  // login and set token in local storage
   const token = await userAPI.login(credentials);
-  localStorage.setItem('token', token.jwt);
   return getUser();
 }
 
@@ -54,4 +52,14 @@ export async function adminVerify(){
     console.error('Error fetching user:', err);
     return false;
   }
+}
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+function removeCookie(name) {
+  document.cookie = `${name}=; Max-Age=0; path=/;`;
 }

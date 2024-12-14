@@ -9,11 +9,11 @@ module.exports = {
     extend: {
       colors: {
       c1: '#1e1e1e',
-      c2: '#121019',
+      c2: '#a3784b',
       c3: '#fd0000',
-      c4: 'white',
-      c5: '#1e1e1e',
-      c6: '#1e1e1e',
+      c4: '#72665b',
+      c5: '#c3c3c3',
+      c6: '#1a1714',
       },
     },
   },
