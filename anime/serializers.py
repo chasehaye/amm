@@ -1,7 +1,8 @@
 import boto3
 from django.conf import settings
 from rest_framework import serializers
-from .models import Anime, Season, Genre, Studio
+from .models import Anime, Season, Genre, Studio, TYPES
+import mimetypes
 
 class AnimeAbbrvSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,7 +20,6 @@ class StudioSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'establishedDate', 'website']
 
 class AnimeSerializer(serializers.ModelSerializer):
-    #  pre/se field
     prequel = serializers.PrimaryKeyRelatedField(
         queryset=Anime.objects.all(),
         allow_null=True,
@@ -30,16 +30,16 @@ class AnimeSerializer(serializers.ModelSerializer):
         allow_null=True,
         required=False
     )
-    # season field
-    premiereSeason = serializers.CharField(allow_null=True)
-    # genre field
+    premiereSeason = serializers.CharField(allow_blank=True, required=False)
     genre = serializers.ListField(
         child=serializers.CharField(),
+        required=False,
+        allow_null=True,
         write_only=True,
-        allow_null=True
+        default=[],
+        min_length=0
     )
-    # studio field
-    studio = serializers.CharField(write_only=True, allow_null=True)
+    studio = serializers.CharField(write_only=True, allow_null=True, required=False,)
     
 
     class Meta:
@@ -66,11 +66,11 @@ class AnimeSerializer(serializers.ModelSerializer):
                   'updated_at',
                   'image'
                  ]
+        
+
 
     def create(self, validated_data):
-        image = validated_data.pop('image', None)
-
-        # handling season field
+        # handle data parsing
         premiere_season_str = validated_data.pop('premiereSeason', None)
         season_instance = None
         if premiere_season_str:
@@ -78,48 +78,54 @@ class AnimeSerializer(serializers.ModelSerializer):
             year = int(year_str)
             season_instance, created = Season.objects.get_or_create(year=year, season=season)
 
-
-        # parsing prequel / sequel
         prequel_instance = validated_data.pop('prequel', None)
         sequel_instance = validated_data.pop('sequel', None)
 
+        genre_data = validated_data.pop('genre', [])
 
-        # handling genre
-        genres_data = validated_data.pop('genre', [])
-        genre_instances = []
-        if genres_data:
-            for genre_data in genres_data:
-                genre_instance, created = Genre.objects.get_or_create(name=genre_data)
-                genre_instances.append(genre_instance)
-
-
-        # handling studio
         studio_name = validated_data.pop('studio', None)
         studio_instance = None
         if studio_name:
             studio_instance, created = Studio.objects.get_or_create(name=studio_name)
 
-        # handling primary creation
+        image = validated_data.pop('image', None)
+
+
+
         anime_instance = self.Meta.model.objects.create(premiereSeason=season_instance, studio=studio_instance, **validated_data)
 
 
         if image:
-            # Initialize S3 client
-            s3_client = boto3.client(
-                's3',
-                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-            )
-            # Ensure image is valid and has content
             if hasattr(image, 'file') and image.file:
-                s3_file_path = f"anime_images/{anime_instance.id}/{image.name}"
-                s3_client.upload_fileobj(
-                    image.file,
-                    settings.AWS_STORAGE_BUCKET_NAME,
-                    s3_file_path,
-                    ExtraArgs={'ContentType': image.content_type}
-                )
-                anime_instance.image = f"{s3_file_path}"
+                content_type = image.content_type
+                if content_type.startswith("image/"):
+
+
+                    s3_file_path = f"anime_images/{anime_instance.id}/{image.name}"
+
+                    s3_client = boto3.client(
+                        's3',
+                        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                    )
+
+                    try:
+                        s3_client.upload_fileobj(
+                            image.file,
+                            settings.AWS_STORAGE_BUCKET_NAME,
+                            s3_file_path,  # Correct file path including folder
+                        )
+                        # Set the image field on the anime instance
+                        anime_instance.image = f"{s3_file_path}"
+                        print(f"File uploaded successfully. Final URL: {anime_instance.image}")
+                    except Exception as e:
+                        print(f"Error uploading file to S3: {e}")
+                else:
+                    print(f"Invalid file type: {content_type}. Only image files are allowed.")
+            else:
+                print("No valid image file found.")
+        else:
+            print("No image provided.")
 
         # handling prequel / sequel linkage
         if prequel_instance:
@@ -130,8 +136,10 @@ class AnimeSerializer(serializers.ModelSerializer):
             anime_instance.sequel = sequel_instance
             sequel_instance.prequel = anime_instance
             sequel_instance.save()
-        #  handling genre linkage
-        anime_instance.genre.set(genre_instances)
+        #  handle genre linkage
+        for genre_name in genre_data:
+            genre, created = Genre.objects.get_or_create(name=genre_name)
+            anime_instance.genre.add(genre)
 
         # save and return
         anime_instance.save()
@@ -140,6 +148,7 @@ class AnimeSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
+        # handle data parsing
         premiere_season_str = validated_data.pop('premiereSeason', None)
         if premiere_season_str:
             season, year_str = premiere_season_str.split(" ")
@@ -148,6 +157,7 @@ class AnimeSerializer(serializers.ModelSerializer):
             instance.premiereSeason = season_instance
         else:
             instance.premiereSeason = None
+
 
         prequel_instance = validated_data.pop('prequel', None)
         sequel_instance = validated_data.pop('sequel', None)
@@ -162,27 +172,33 @@ class AnimeSerializer(serializers.ModelSerializer):
             prequel_instance.sequel = instance
             prequel_instance.save()
         else:
-            instance.prequel = None  # Remove existing prequel if not provided
+            if instance.prequel:
+                instance.prequel.sequel = None  # Unlink existing prequel
+                instance.prequel.save()
+            instance.prequel = None
         
         if sequel_instance:
             instance.sequel = sequel_instance
             sequel_instance.prequel = instance
             sequel_instance.save()
         else:
-            instance.sequel = None  # Remove existing sequel if not provided
+            if instance.sequel:
+                instance.sequel.prequel = None  # Unlink existing sequel
+                instance.sequel.save()
+            instance.sequel = None
 
-        # Handle genres
-        genres_data = validated_data.pop('genre', [])
-        genre_instances = []
-        for genre_data in genres_data:
-            genre_instance, _ = Genre.objects.get_or_create(name=genre_data)
-            genre_instances.append(genre_instance)
-        if genre_instances:
-            instance.genre.set(genre_instances)
+
+        genre_data = validated_data.pop('genre', [])
+        if genre_data:
+            genre_instances = []
+            for genre_name in genre_data:
+                genre_instance, _ = Genre.objects.get_or_create(name=genre_name)
+                genre_instances.append(genre_instance)
+            instance.genre.set(genre_instances)  # Replace genres with new set
         else:
-            instance.genre.clear()
+            instance.genre.clear() 
 
-        # Handle studio
+
         studio_name = validated_data.pop('studio', None)
         if studio_name:
             studio_instance, _ = Studio.objects.get_or_create(name=studio_name)
@@ -192,27 +208,33 @@ class AnimeSerializer(serializers.ModelSerializer):
 
 
         # Handle image upload
+        
         image = validated_data.pop('image', None)
         if image:
-            s3_client = boto3.client(
-                's3',
-                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-            )
             # Ensure image is valid and has content
             if hasattr(image, 'file') and image.file:
                 s3_file_path = f"anime_images/{instance.id}/{image.name}"
-                s3_client.upload_fileobj(
-                    image.file,
-                    settings.AWS_STORAGE_BUCKET_NAME,
-                    s3_file_path,
-                    ExtraArgs={'ContentType': image.content_type}
+                s3_client = boto3.client(
+                    's3',
+                    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
                 )
-                instance.image = f"{s3_file_path}"
+                try:
+                    content_type = mimetypes.guess_type(image.name)[0] or 'application/octet-stream'
+                    s3_client.upload_fileobj(
+                        image.file,
+                        settings.AWS_STORAGE_BUCKET_NAME,
+                        s3_file_path,
+                        ExtraArgs={'ContentType': content_type}
+                    )
+                    instance.image = s3_file_path
+                except Exception as e:
+                    print(f"Error uploading file to S3: {e}")
 
-        # Update the remaining fields
+        # Update remaining fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+
 
         # Save and return the updated instance
         instance.save()

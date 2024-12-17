@@ -1,16 +1,17 @@
 from django.urls import path
-from .views import CreateAnimeView, IndexAnimeView, FindAnimeView, DeleteAnimeView, UpdateAnimeView, SearchIndexAnimeView, FindAnimeAbbrvView
+from .views import CreateAnimeView, IndexAnimeView, FindAnimeView, DeleteAnimeView, UpdateAnimeView, SearchIndexAnimeView, FindAnimeAbbrvView, OrderIndexAnimeView
 from .views import CreateStudioView, IndexStudioView, DeleteStudioView, CreateGenreView, IndexGenreView, DeleteGenreView
 
 urlpatterns = [
     # Anime related views
     path('index/search', SearchIndexAnimeView.as_view()),
     path('create', CreateAnimeView.as_view()),
-    path('index', IndexAnimeView.as_view()),
+    path('index/base', IndexAnimeView.as_view()),
     path('<int:id>/abbrv', FindAnimeAbbrvView.as_view()),
     path('<int:id>', FindAnimeView.as_view()),
     path('<int:id>/delete', DeleteAnimeView.as_view()),
     path('<int:id>/update', UpdateAnimeView.as_view()),
+    path('index/by', OrderIndexAnimeView.as_view()),
     # Studio views
     path('studio/create', CreateStudioView.as_view()),
     path('studio/index', IndexStudioView.as_view()),

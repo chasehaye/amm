@@ -115,18 +115,18 @@ function NavBar() {
                     <span className="absolute right-0 bottom-0 w-full h-1/2 border-b-2 border-c4"></span>
                 </Link>
 
-                <div className="p-2 flex-1 text-center cursor-pointer hover:text-c2 relative" onMouseEnter={() => setIsTrendingHovered(true)} onMouseLeave={() => setIsTrendingHovered(false)}>
+                <div className="p-2 flex-1 text-center cursor-pointer hover:text-c2 relative" onMouseEnter={() => setIsTrendingHovered(true)} onMouseLeave={() => setIsTrendingHovered(false)} onClick={() => handleRedirect(`/trending`)}>
                     <p className="select-none ">Trending</p>
                     <span className="absolute bottom-0 transform translate-y-1/2 right-0 h-20 border-r-2 border-c4"></span>
                     <span className="absolute right-0 bottom-0 w-full h-1/2 border-b-2 border-c4"></span>
                 </div>
 
-                <div className="p-2 flex-1 text-center cursor-pointer hover:text-c2 relative" onMouseEnter={() => setIsMangaHovered(true)} onMouseLeave={() => setIsMangaHovered(false)} onClick={() => handleRedirect(`/mangaList/${user.name}`)}>
+                <div className="p-2 flex-1 text-center cursor-pointer hover:text-c2 relative" onMouseEnter={() => setIsMangaHovered(true)} onMouseLeave={() => setIsMangaHovered(false)} onClick={() => handleRedirect(user?.name ? `/mangaList/${user.name}` : '/mangaList')}>
                     <p className="select-none ">Manga</p>
                     <span className="absolute bottom-1/2 transform translate-y-1/2 right-0 h-20 border-r-2 border-c4"></span>
                     <span className="absolute right-0 bottom-0 w-full h-1/2 border-b-2 border-c4"></span>
                 </div>
-                <div className="p-2 flex-1 text-center cursor-pointer hover:text-c2 relative" onMouseEnter={() => setIsAnimeHovered(true)} onMouseLeave={() => setIsAnimeHovered(false)} onClick={() => handleRedirect(`/animeList/${user.name}`)}>
+                <div className="p-2 flex-1 text-center cursor-pointer hover:text-c2 relative" onMouseEnter={() => setIsAnimeHovered(true)} onMouseLeave={() => setIsAnimeHovered(false)} onClick={() => handleRedirect(user?.name ? `/animeList/${user.name}` : '/AnimeList')}>
                     <p className="select-none ">Anime</p>
                     <span className="absolute bottom-0 transform translate-y-1/2 right-0 h-20 border-r-2 border-c4"></span>
                     <span className="absolute right-0 bottom-0 w-full h-1/2 border-b-2 border-c4"></span>
@@ -179,7 +179,7 @@ function NavBar() {
                 </div>
                 <div className="p-2 flex-1 relative">
                     <div className={`p-2 absolute top-0 left-0 w-full text-center cursor-pointer ${isAnimeHovered ? '' : 'hidden'}`} onMouseEnter={() => setIsAnimeHovered(true)} onMouseLeave={() => setIsAnimeHovered(false)}>
-                        <div className="hover:text-c2 text-left ml-8 mb-1 border-b w-2/3 border-c4 pl-1 select-none ">top anime</div>
+                        <div className="hover:text-c2 text-left ml-8 mb-1 border-b w-2/3 border-c4 pl-1 select-none " onClick={() => handleRedirect('/top/anime')}>top anime</div>
                         <div className="hover:text-c2 text-left ml-8 mb-1 border-b w-1/2 border-c4 pl-1 select-none ">recommended</div>
                         <div className="hover:text-c2 text-left ml-8 mb-1 border-b w-1/3 border-c4 pl-1 select-none ">seasonal</div>
                         <div className="hover:text-c2 text-left ml-8 mb-1 border-b w-1/4 border-c4 pl-1 select-none ">popular</div>
@@ -189,6 +189,7 @@ function NavBar() {
                     <div className={`p-2 absolute top-0 left-0 w-full text-center cursor-pointer ${isSearchHovered ? '' : 'hidden'}`} onMouseEnter={handleSearchHover} onMouseLeave={handleSearchLeave} onClick={toggleSearchClick}>
                         {/* Search Input */}
                         <input
+                            name='search'
                             type="text"
                             className="mx-auto p-2 mx-auto mb-2 w-48 bg-c5 text-c6 h-8"
                             placeholder="Search..."

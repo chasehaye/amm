@@ -3,7 +3,6 @@ import * as userAPI from './user-api';
 export async function register(userData) {
   // register a user
    const token = await userAPI.register(userData);
-   //localStorage.setItem('token', token.jwt);
   return getUser();
 }
 

@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { getAbbrvAnimeRequest } from "../../utilities/anime-api";
-import { linkAnimeToUser, retrieveUserRating, updateUserAnimeRating } from "../../utilities/user-api";
+import { linkAnimeToUser, retrieveUserAnimeInfo, updateUserAnimeRating, updateUserEpisodeCnt } from "../../utilities/user-api";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserProvider";
@@ -70,6 +70,7 @@ function AnimeDetailItem ({anime}) {
             setIsValidLinkEstablished(selection)
         }
         setIsSelectVisible(false);
+        setIsListSubMenu(false);
     }
 
     useEffect(() => {
@@ -83,20 +84,37 @@ function AnimeDetailItem ({anime}) {
 
     // opening close rating menu
     const [isRatingMenuHovered, setIsRatingMenuHovered] = useState(false);
-    const [userRating, setUserRating] = useState("-")
+    const [userRating, setUserRating] = useState(null);
+    useEffect(() => {
+        if (userRating === null) {
+            setUserRating("-");
+        }
+    }, [userRating]);
+
+    const [userListType, setUserListType] = useState(null)
+    const [userEpidsodeCount, setUserEpisodeCount] = useState(null)
+    const [ isListSubMenu, setIsListSubMenu] = useState(false);
+
+    useEffect(() => {
+        if (userEpidsodeCount === null) {
+            setUserEpisodeCount("-");
+        }
+    }, [userEpidsodeCount]);
 
     useEffect(() => {
         async function fecthAnimeRatingFromUser() {
             try{
-                const response = await retrieveUserRating(user.name, anime.id, {userId: user.id});
-                setUserRating(response.rating)
+                const userInfoResponse = await retrieveUserAnimeInfo(user.name, anime.id, {userId: user.id});
+                setUserRating(userInfoResponse.rating);
+                setUserListType(userInfoResponse.list);
+                setUserEpisodeCount(userInfoResponse.episodeCount);
             }catch(e){
                 console.log(e)
             }
         }
 
         fecthAnimeRatingFromUser();
-    }, []);
+    }, [isValidLinkEstablished]);
 
     const handleRatingUpdate = async (selection) => {
         try{
@@ -111,6 +129,79 @@ function AnimeDetailItem ({anime}) {
             console.log(err)
         }
     }
+
+    const UpdateUserAnimeEpisodeCount = async (selection) => {
+        try{
+            const queryParameters = {
+                userId: user.id,
+                watchedEpisodeCount: selection
+            };
+            const response = await updateUserEpisodeCnt(user.name, anime.id, queryParameters);
+            setUserEpisodeCount(response.episodeCount);
+        }catch(err){
+            console.log(err)
+        }
+    }
+
+
+
+
+    // PICK UP HERE
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedCount, setEditedCount] = useState(userEpidsodeCount);
+    const contentEditableRef = useRef(null);
+
+    useEffect(() => {
+        if (isEditing && contentEditableRef.current) {
+            contentEditableRef.current.focus();
+        }
+    }, [isEditing]);
+
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            handleBlur();
+            UpdateUserAnimeEpisodeCount(editedCount)
+            setEditedCount(null)
+        }
+    };
+
+    const handleInputChange = (event) => {
+        const cursorPosition = getCursorPosition(contentEditableRef.current);
+        const newValue = event.target.innerText;
+        setEditedCount(newValue);
+        setTimeout(() => {
+            restoreCursorPosition(contentEditableRef.current, cursorPosition);
+        }, 0);
+    };
+
+    const handleBlur = () => {
+        // On blur (losing focus), save the updated count
+        if (editedCount === "-" || isNaN(editedCount) || editedCount <= 0) {
+            setEditedCount(userEpidsodeCount); // Reset if the input is invalid
+        }
+        setIsEditing(false); // Close the input field
+    };
+
+    const getCursorPosition = (element) => {
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const clonedRange = range.cloneRange();
+        clonedRange.selectNodeContents(element);
+        clonedRange.setEnd(range.startContainer, range.startOffset);
+        return clonedRange.toString().length;
+    };
+
+    // Restore the cursor position within the contentEditable div
+    const restoreCursorPosition = (element, position) => {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.setStart(element.firstChild, position);
+        range.setEnd(element.firstChild, position);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    };
+
+    
 
 
     return (
@@ -209,9 +300,9 @@ function AnimeDetailItem ({anime}) {
 
                     <div className="border-t border-c4 w-3/4"></div>
                     <div className="flex mt-2">
-                        <div className="ml-2 mr-2">{`Episodes: ${anime.episodes}` || "?"}</div>
+                        <div className="ml-2 mr-2">{`Episodes: ${anime.episodes}` || "Episodes: ?"}</div>
                         <span className="">|</span>
-                        <div className="ml-2">{anime.episodeDuration ? `Duration: ${anime.episodeDuration} min. per` : "?"}</div>
+                        <div className="ml-2">{anime.episodeDuration ? `Duration: ${anime.episodeDuration} min. per` : "? min. per"}</div>
                     </div>
 
 
@@ -250,7 +341,7 @@ function AnimeDetailItem ({anime}) {
                                         {index < anime.genre.length - 1 && ", "}
                                     </span>
                                 ))
-                                : "No genres available"}
+                                : "(Not Available)"}
                             </div>
                             </>
                         ) : (
@@ -262,12 +353,16 @@ function AnimeDetailItem ({anime}) {
                     {anime.demographic ? (
                             <div className="">Demographic: {anime.demographic}</div>
                         ) : (
-                            <div className="">Demographic (Not Available)</div>
+                            <div className="">Demographic: (Not Available)</div>
                         )}
                     </div>
 
                     <div className="mt-2 ml-2">
-                        Type: {anime.type}
+                        {anime.type ? (
+                            <div>Type: {anime.type}</div>
+                        ) : (
+                            <div>Type: (Not Available)</div>
+                        )}
                     </div>
 
 
@@ -283,29 +378,28 @@ function AnimeDetailItem ({anime}) {
                 <div className="flex border border-c4 rounded-lg ml-[10%] mt-4 w-[40%]">
                     <div className="m-3">
                         <div className="text-center">Rating</div>
-                        <div className="text-3xl">{anime.aggregateRating || "N/A"}</div>
+                        <div className="text-3xl flex justify-center items-center">{anime.aggregateRating.toFixed(2) || "N/A"}</div>
                     </div>
                     <div className="mt-3">
-                        <div>{anime.premiereSeason || "No premiere season"}</div>
+                        <div>{anime.premiereSeason || "-season-"}</div>
                         <div className="flex">
-                            <div className="mr-3">{anime.type || "No type specified"}</div>
+                            <div className="mr-3">{anime.type || "-type-"}</div>
                             <span>|</span>
-                            <div className="mr-3 ml-3">{anime.studio?.name || "No studio"}</div>
+                            <div className="mr-3 ml-3">{anime.studio?.name || "-studio-"}</div>
                         </div>
                     </div>
                 </div>
                 
+
+                {user && (
                 <div className="flex w-[50%] mx-auto mt-4 border border-c4 rounded-md relative">
                     <div className="flex border-b border-r border-c4 m-2 w-[20%] py-1 pl-2 group cursor-pointer" onMouseEnter={() => setIsRatingMenuHovered(true)}  onMouseLeave={() => setIsRatingMenuHovered(false)}>
-                        <div className="flex">
+                        <div className="flex group-hover:text-c2">
                             <div className="">
-                                rating
-                            </div>
-                            <div className="pl-1 text-c2 hover:text-c4 group-hover:text-c4">
-                                v
+                                rating |
                             </div>
                         </div>
-                        <div className="mx-auto">
+                        <div className="ml-2">
                            {userRating}
                         </div>
                     </div>
@@ -313,10 +407,10 @@ function AnimeDetailItem ({anime}) {
                         <div className="absolute mt-10 mx-2 left-0 w-[20%] border-x border-t border-c4 bg-c6 z-10 text-center flex flex-col" onMouseEnter={() => setIsRatingMenuHovered(true)}  onMouseLeave={() => setIsRatingMenuHovered(false)}>
                         {Array.from({ length: 10 }, (_, index) => (
                             <div key={index} className="py-1 pl-2 border-b border-c4 flex cursor-pointer group" onClick={() => {handleRatingUpdate(index + 1)}}>
-                                <div className="mr-2">
+                                <div className="mr-2 group-hover:text-c2">
                                     rate
                                 </div>
-                                <div className="pl-1 text-c2 hover:text-c4 group-hover:text-c4">
+                                <div className="pl-1 text-c4 hover:text-c2 group-hover:text-c2">
                                     +
                                 </div>
                                 <div className="mx-auto">
@@ -326,14 +420,64 @@ function AnimeDetailItem ({anime}) {
                         ))}
                         </div>
                     )}
-                </div>
 
-                <div className="ml-4 mt-4 border-t border-c4 pr-40">
-                    <div>
+                    {userListType && (
+                        <div className="w-[28%] flex flex-col relative mr-2">
+
+                            <div className="border-t border-l border-c4 m-2 py-1 pl-2 cursor-pointer w-full" onClick={() => setIsListSubMenu((prev) => !prev)}>
+                                {userListType}
+                            </div>
+                            {isListSubMenu && (
+                                <>
+                                <div className="absolute mt-10 mx-2 left-0 w-full border-l border-c4  z-10 text-center cursor-pointer pt-3 hover:text-c2" onClick={() => handleSelectionLinkage(7)}>
+                                    remove list
+                                </div>
+                                </>
+                            )}
+                        </div>
+                    )}
+
+
+                    <div className="flex border-b border-l border-c4 m-2 w-[20%] py-1 pl-2" >
+                        <div className="cursor-pointer flex pl-1" onClick={() => setIsEditing(true)}>
+                            <div>
+                                {isEditing ? (
+                                    <div
+                                        ref={contentEditableRef}
+                                        contentEditable
+                                        suppressContentEditableWarning
+                                        onInput={handleInputChange}
+                                        onKeyPress={handleKeyPress}
+                                        onBlur={handleBlur}
+                                        className="w-12 text-center mr-2 mb-1 outline-none"
+                                        
+                                    >
+                                        {editedCount === "-" ? 0 : editedCount}
+                                    </div>
+                                ) :(
+                                    <span className="hover:text-c2" >{userEpidsodeCount}</span>
+                                )}
+                            </div>
+                            <div>
+                            /{anime.episodes ?? "-"}
+                            </div>
+                        </div>
+                        <div className=" ml-3 text-c4 px-1 h-4 my-auto border-x border-c4  flex items-center justify-center cursor-pointer hover:text-c2 hover:border-c2"   onClick={() => {
+                            const updatedEpisodeCount = userEpidsodeCount === "-" ? 1 : userEpidsodeCount + 1;
+                            UpdateUserAnimeEpisodeCount(updatedEpisodeCount);
+                        }}>
+                            +
+                        </div>
+                    </div>
+                </div>
+                )}
+
+                <div className="ml-4 mt-7 border-t border-c4 pr-40">
+                    <div className="pt-2">
                         Description/Synposis:
                     </div>
                     <div className="mt-2 mb-4 pl-4">
-                        {anime.description || "No description available"}
+                        {anime.description || "(Not available)"}
                     </div>
                 </div>
 

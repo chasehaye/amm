@@ -35,6 +35,9 @@ function UserAnimePage() {
     return(
         <>
         <NavBar/>
+            <div className="flex w-full justify-center items-center text-center mx-auto border-b border-c4 pb-4">
+                Your Anime
+            </div>
 
             <div className="mt-10 flex w-[70vw] mx-auto border border-c4 h-14 mb-4">
                 <div className="p-2 text-center flex-1 cursor-pointer hover:text-c2 relative border-r border-c4 h-14 flex items-center justify-center select-none " onClick={() => handleListSelectionChange(0)}>

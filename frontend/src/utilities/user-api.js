@@ -31,10 +31,14 @@ export function retrieveUserList(username, queryParameters) {
   return sendRequest(`${BASE_URL}/${username}/list/anime`, 'GET', null, queryParameters);
 }
 
-export function retrieveUserRating(username, animeId, queryParameters) {
-  return sendRequest(`${BASE_URL}/${username}/rating/for/${animeId}`, 'GET', null, queryParameters);
+export function retrieveUserAnimeInfo(username, animeId, queryParameters) {
+  return sendRequest(`${BASE_URL}/${username}/info/for/${animeId}`, 'GET', null, queryParameters);
 }
 
 export function updateUserAnimeRating(username, animeId, queryParameters) {
   return sendRequest(`${BASE_URL}/${username}/rate/${animeId}`, 'POST', null, queryParameters);
+}
+
+export function updateUserEpisodeCnt(username, animeId, queryParameters){
+  return sendRequest(`${BASE_URL}/${username}/ep/cnt/${animeId}`, 'POST', null, queryParameters);
 }

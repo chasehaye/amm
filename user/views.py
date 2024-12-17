@@ -1,10 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework import status
 import jwt, datetime
 
-from .serializers import UserSerializer
-from .models import User
+from .serializers import UserSerializer, WatchedEpisodesSerializer
+from .models import User, WatchedEpisodes
 
 
 from django.shortcuts import get_object_or_404
@@ -23,7 +24,7 @@ class RegisterView(APIView):
         payload = {
             'id': user.id,
             'name': user.name,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
             'iat': datetime.datetime.utcnow()
         }
         token = jwt.encode(payload, 'secret', algorithm='HS256')
@@ -49,7 +50,7 @@ class LoginView(APIView):
         payload = {
             'id': user.id,
             'name': user.name,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
             'iat': datetime.datetime.utcnow()
         }
         token = jwt.encode(payload, 'secret', algorithm='HS256')
@@ -119,6 +120,8 @@ class PermissionView(APIView):
 #User Anime relation views
 class LinkAnimeToUserListView(APIView):
     def post(self, request, username):
+
+
         user_id = request.GET.get('user_id')
         anime_id = request.GET.get('anime_id')
         list_type = request.GET.get('list_type')
@@ -148,6 +151,8 @@ class LinkAnimeToUserListView(APIView):
             user.interested_in.add(anime)
         elif list_type == '6':
             user.on_hold.add(anime)
+        elif list_type == '7':
+            pass
         else:
             return Response({"message": "Invalid list type provided."}, status=400)
         return Response({
@@ -218,17 +223,70 @@ class RateAnimeForUserView(APIView):
 
         return Response({"rating": f"{score}"})
 
-class GetUserRatingForAnime(APIView):
+class SetAnimeWatchNumberView(APIView):
+    def post(self, request, username, animeId):
+
+        anime = get_object_or_404(Anime, id=animeId)
+        watchedEpisodeCount = request.GET.get('watchedEpisodeCount')
+        userId = request.GET.get('userId')
+        user = get_object_or_404(User, id=userId)
+
+        if userId is None:
+            return Response({"error": "User Id is required."}, status=400)
+        
+        try:
+            watchedEpisodeCount = int(watchedEpisodeCount)
+        except ValueError:
+            return Response({"error": "watchedEpisodeCount must be a valid integer"}, status=400)
+        watched_instance, created = WatchedEpisodes.objects.get_or_create(user=user, anime=anime)
+        watched_instance.episodes_watched = watchedEpisodeCount
+        watched_instance.save()
+
+        
+        return Response({"episodeCount": watched_instance.episodes_watched}, status=201 if created else 200)
+
+        
+
+    # finsih so it sets episode count when either created or updated
+    # silently handle all inputs if it is NAN return an error
+    # save the creation
+
+
+
+class GetUserInfoForAnime(APIView):
     def get(self, request, username, animeId):
         anime = get_object_or_404(Anime, id=animeId)
         userId = request.GET.get('userId')
+
         if userId is None:
             return Response({"error": "User Id is required."}, status=400)
         user = get_object_or_404(User, id=userId)
 
+
+
         rating = Rating.objects.filter(user=user, anime=anime).first()
 
-        if rating:
-            return Response({"rating": rating.score})  # Send the user's rating
-        else:
-            return Response({"message": "No rating found for this anime."}, status=404)
+        watched_episode = WatchedEpisodes.objects.filter(user=user, anime=anime).first()
+        watched_episode_count = watched_episode.episodes_watched if watched_episode else None
+
+        list_name = None
+        if anime in user.currently_watching.all():
+            list_name = "Currently Watching"
+        elif anime in user.completed.all():
+            list_name = "Completed"
+        elif anime in user.plan_to_watch.all():
+            list_name = "Plan To Watch"
+        elif anime in user.dropped.all():
+            list_name = "Dropped"
+        elif anime in user.interested_in.all():
+            list_name = "Interested In"
+        elif anime in user.on_hold.all():
+            list_name = "On Hold"
+
+        response_data = {
+            "rating": rating.score if rating else None,
+            "list": list_name,
+            "episodeCount": watched_episode_count
+        }
+
+        return Response(response_data)

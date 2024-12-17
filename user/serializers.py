@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, WatchedEpisodes, Anime
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,3 +16,8 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
             instance.save()
         return instance
+    
+class WatchedEpisodesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WatchedEpisodes
+        fields = ['id', 'user', 'anime', 'episodes_watched']

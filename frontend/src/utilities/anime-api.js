@@ -2,10 +2,15 @@ import sendRequest from "./send-request";
 const BASE_URL = '/api/anime';
 
 export function index(){
-    return sendRequest(`${BASE_URL}/index`, 'GET');
+    return sendRequest(`${BASE_URL}/index/base`, 'GET');
 }
 
+export function indexOrder(queryParameters){
+    return sendRequest(`${BASE_URL}/index/by`, 'GET', null, queryParameters)
+}   
+
 export function createNewAnime(animeData, imageFile){
+    console.log(animeData)
     const formData = new FormData();
     if (imageFile) {
         formData.append('image', imageFile);

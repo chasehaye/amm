@@ -74,16 +74,16 @@ class Rating(models.Model):
 class Anime(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True) 
-    titleEnglish = models.CharField(max_length=255, unique=True, null=True)
+    titleEnglish = models.CharField(max_length=255, null=True)
     titleJpRoman = models.CharField(max_length=255, unique=True,)
-    titleJpKanji = models.CharField(max_length=255, unique=True, null=True)
-    description = models.CharField(max_length=1000, unique=True, null=True)
+    titleJpKanji = models.CharField(max_length=255, null=True)
+    description = models.CharField(max_length=1000, null=True)
     image = models.ImageField(upload_to='anime_images/', null=True, blank=True)
     type = models.CharField(choices=TYPES, null=True)
     episodes = models.IntegerField(null=True)
     episodeDuration = models.IntegerField(null=True)
     premiereSeason = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True, blank=True)
-    genre = models.ManyToManyField(Genre)
+    genre = models.ManyToManyField(Genre, blank=True)
     prequel = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='prequel_anime', null=True, blank=True)
     sequel = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='sequel_anime', null=True, blank=True)
     demographic = models.CharField(max_length=20, choices=DEMOGRAPHIC, null=True)
@@ -94,6 +94,7 @@ class Anime(models.Model):
     total_rating = models.BigIntegerField(default=0)
     aggregateRating = models.FloatField(default=0)
     studio = models.ForeignKey(Studio, on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey('user.User', on_delete=models.SET_NULL, null=True, blank=True, related_name="created_animes")
 
     def update_aggregate_rating(self):
         if self.rating_count > 0:

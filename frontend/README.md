@@ -1,8 +1,20 @@
-# React + Vite
+# Development notes
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+    
+        consider pagifying through useffect the indexing of data
+        
+        for update and create handle the self issue regarding link display, thinking just parse it out on front
+        
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+        Have log in and register clear any remaing cookies so there are no conflicts cookies
+
+        revise how the form looks
+
+        
+
+        super user script on deployment?
+
+        postgres amazon and aws
+
+

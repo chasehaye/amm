@@ -46,7 +46,9 @@ function Login() {
           </div>
         </form>
       </div>
-      <p className="error-message">&nbsp;{error}</p>
+      {error && (
+        <p className="error-message flex mx-auto items-center justify-center mt-10 border-y border-c4 w-[20%]">&nbsp;{error}</p>
+      )}
     </>
   );
 };

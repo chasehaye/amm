@@ -33,8 +33,9 @@ function AdminList() {
                 </div>
 
                 <div className="flex p-3 w-[70vw] mx-auto border-b border-l border-r border-c4 border-c4 mb-10">
-                    <div className="w-[30vw]">
+                    <div className="w-[30vw] flex justify-between">
                         <span className='ml-8'>Anime</span>
+                        <div className='mr pr-40 pl-2'>Title</div>
                     </div>
 
 

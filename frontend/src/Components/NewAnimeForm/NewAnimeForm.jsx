@@ -1,12 +1,15 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { createNewAnime, indexGenre, indexStudio, searchAnime } from "../../utilities/anime-api"; 
 import DatePicker from "react-datepicker";
 import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
+import { UserContext } from "../../UserProvider";
 
 const NewAnimeForm = () => {
     const navigate = useNavigate();
+    const { user } = useContext(UserContext);
+    
 
     const [ error, setError ] = useState('');
 
@@ -14,7 +17,7 @@ const NewAnimeForm = () => {
     const [type, setType] = useState(null);
     const [demographic, setDemographic] = useState(null);
     const titleEnglishRef = useRef(null);
-    const titleJpRomanRef = useRef('');
+    const titleJpRomanRef = useRef(null);
     const titleJpKanjiRef = useRef(null);
     const descriptionRef = useRef(null);
     const episodesRef = useRef(null);
@@ -190,29 +193,25 @@ const NewAnimeForm = () => {
         const formattedEndDate = endDate ? new Date(endDate).toISOString().split('T')[0] : '';
 
         
-        const handleEmptyString = (value) => {
-            return value === "" ? null : value;
-        };
 
-        const newAnime = {
-            titleEnglish: handleEmptyString(titleEnglishRef.current.value),
-            titleJpRoman: handleEmptyString(titleJpRomanRef.current.value),
-            titleJpKanji: handleEmptyString(titleJpKanjiRef.current.value),
-            description: handleEmptyString(descriptionRef.current.value),
-            type: handleEmptyString(type),
-            episodes: handleEmptyString(episodesRef.current.value),
-            episodeDuration: handleEmptyString(episodeDurationRef.current.value),
-            premiereSeason: handleEmptyString(premiereSeason),
-            genre: selectedGenres,
-            demographic: handleEmptyString(demographic),
-            airDate: handleEmptyString(formattedAirDate),
-            endDate: handleEmptyString(formattedEndDate),
-            prequel: prequel ? prequel.id : null,
-            sequel: sequel ? sequel.id : null,
-            studio: handleEmptyString(selectedStudio)
-        }
+        const newAnime = {created_by: user.id};
+
+        if (titleEnglishRef.current.value) newAnime.titleEnglish = titleEnglishRef.current.value;
+        if (titleJpRomanRef.current.value) newAnime.titleJpRoman = titleJpRomanRef.current.value;
+        if (titleJpKanjiRef.current.value) newAnime.titleJpKanji = titleJpKanjiRef.current.value;
+        if (descriptionRef.current.value) newAnime.description = descriptionRef.current.value;
+        if (type) newAnime.type = type;
+        if (episodesRef.current.value) newAnime.episodes = episodesRef.current.value;
+        if (episodeDurationRef.current.value) newAnime.episodeDuration = episodeDurationRef.current.value;
+        if (premiereSeason) newAnime.premiereSeason = premiereSeason;
+        if (demographic) newAnime.demographic = demographic;
+        if (formattedAirDate) newAnime.airDate = formattedAirDate;
+        if (formattedEndDate) newAnime.endDate = formattedEndDate;
+        if (prequel) newAnime.prequel = prequel.id;
+        if (sequel) newAnime.sequel = sequel.id;
+        if (selectedStudio) newAnime.studio = selectedStudio;
+        if (selectedGenres.length > 0) newAnime.genre = selectedGenres;
         try{
-            console.log(newAnime);
             const newAnimeCallResponse = await createNewAnime(newAnime, imageFile);
             navigate("/admin/home");
         }catch{

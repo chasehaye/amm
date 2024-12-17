@@ -15,13 +15,13 @@ function AnimeItem({anime}) {
                             <img 
                             src={anime.image} 
                             alt={"?"} 
-                            className="w-[87px] h-[123px] object-cover ml-[1vw]" 
+                            className="w-[87px] h-[123px] object-cover ml-[1vw] mr-10" 
                             />
                         ) : (
-                            <div className="w-[87px] h-[123px] my-4 mx-4 bg-c4 text-c6 flex items-center justify-center"><span className="text-5xl">?</span></div>
+                            <div className="w-[87px] h-[123px] my-4 mx-4 bg-c4 text-c6 flex items-center justify-center mr-10"><span className="text-5xl">?</span></div>
                         )
                         }
-                        <div className="flex-1 px-[8vw] text-left">
+                        <div className="flex text-left w-80 break-words overflow-hidden whitespace-normal">
                             {anime.titleEnglish ? anime.titleEnglish : anime.titleJpRoman}
                         </div>
                     </div>
@@ -29,22 +29,22 @@ function AnimeItem({anime}) {
                 </div>
 
 
-                <div className="w-[10vw] justify-center text-center">
+                <div className="w-[10vw] justify-center text-center break-words overflow-hidden">
                     {anime.episodes ? anime.episodes : "N/A"}
                 </div>
                     
-                <div className="w-[10vw] justify-center text-center">
+                <div className="w-[10vw] justify-center text-center break-words overflow-hidden">
                     {anime.premiereSeason ? anime.premiereSeason : "N/A"}
                 </div>
                     
-                <div className="w-[10vw] justify-center text-center">
+                <div className="w-[10vw] justify-center text-center break-words overflow-hidden">
                     <span>
                         {anime.studio?.name ? anime.studio.name : "N/A"}
                     </span>
                 </div>
 
-                <div className="w-[10vw] justify-center text-center">
-                    {anime.aggregateRating ? anime.aggregateRating : "N/A"}
+                <div className="w-[10vw] justify-center text-center break-words overflow-hidden">
+                    {anime.aggregateRating ? anime.aggregateRating.toFixed(2) : "N/A"}
                 </div>
 
 

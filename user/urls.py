@@ -1,6 +1,7 @@
 from django.urls import path
+from django.contrib import admin
 from .views import RegisterView, LoginView, UserView, LogoutView, PermissionView
-from .views import RateAnimeForUserView, LinkAnimeToUserListView, GetAnimeListForUserView, GetUserRatingForAnime
+from .views import RateAnimeForUserView, LinkAnimeToUserListView, GetAnimeListForUserView, GetUserInfoForAnime, SetAnimeWatchNumberView
 
 urlpatterns = [
     # user based views
@@ -12,19 +13,8 @@ urlpatterns = [
     # anime user related views
     path('<str:username>/link/anime', LinkAnimeToUserListView.as_view()),
     path('<str:username>/list/anime', GetAnimeListForUserView.as_view()),
-    path('<str:username>/rating/for/<int:animeId>', GetUserRatingForAnime.as_view()),
+    path('<str:username>/info/for/<int:animeId>', GetUserInfoForAnime.as_view()),
     path('<str:username>/rate/<int:animeId>', RateAnimeForUserView.as_view()),
-
-
-
-
-
-
-
-
-    # --- anime related views --- #
-
-    # rating views
-    #  ^ payload is score: 1-10 ^
+    path('<str:username>/ep/cnt/<int:animeId>', SetAnimeWatchNumberView.as_view())
 
 ]

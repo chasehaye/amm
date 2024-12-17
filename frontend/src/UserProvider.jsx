@@ -14,7 +14,6 @@ const UserProvider = ({ children }) => {
                 const fetchedUser = await grabUser();
                 setUser(fetchedUser);
             } catch (err) {
-                console.error('Failed to fetch user:', err);
                 setUser(null);
             }
         };
@@ -30,7 +29,6 @@ const UserProvider = ({ children }) => {
                     const isAdmin = await adminVerify();
                     setAdmin(isAdmin);
                 } catch (err) {
-                    console.error('Failed to fetch admin status:', err);
                     setAdmin(false);
                 }
             }else{

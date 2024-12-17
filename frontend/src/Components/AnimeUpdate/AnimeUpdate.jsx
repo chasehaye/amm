@@ -212,27 +212,23 @@ function AnimeItemDetail({anime, setAnime}){
         const formattedAirDate = airDate ? new Date(airDate).toISOString().split('T')[0] : '';
         const formattedEndDate = endDate ? new Date(endDate).toISOString().split('T')[0] : '';
 
-        const handleEmptyString = (value) => {
-            return value === "" ? null : value;
-        };
+        const updatedAnime = {};
 
-        const updatedAnime = {
-            titleEnglish: handleEmptyString(titleEnglishRef.current.value),
-            titleJpRoman: handleEmptyString(titleJpRomanRef.current.value),
-            titleJpKanji: handleEmptyString(titleJpKanjiRef.current.value),
-            description: handleEmptyString(descriptionRef.current.value),
-            type: handleEmptyString(type),
-            episodes: handleEmptyString(episodesRef.current.value),
-            episodeDuration: handleEmptyString(episodeDurationRef.current.value),
-            premiereSeason: handleEmptyString(premiereSeason),
-            genre: selectedGenres,
-            demographic: handleEmptyString(demographic),
-            airDate: handleEmptyString(formattedAirDate),
-            endDate: handleEmptyString(formattedEndDate),
-            prequel: prequel ? prequel.id : null,
-            sequel: sequel ? sequel.id : null,
-            studio: handleEmptyString(selectedStudio)
-        }
+        if (titleEnglishRef.current.value) updatedAnime.titleEnglish = titleEnglishRef.current.value;
+        if (titleJpRomanRef.current.value) updatedAnime.titleJpRoman = titleJpRomanRef.current.value;
+        if (titleJpKanjiRef.current.value) updatedAnime.titleJpKanji = titleJpKanjiRef.current.value;
+        if (descriptionRef.current.value) updatedAnime.description = descriptionRef.current.value;
+        if (type) updatedAnime.type = type;
+        if (episodesRef.current.value) updatedAnime.episodes = episodesRef.current.value;
+        if (episodeDurationRef.current.value) updatedAnime.episodeDuration = episodeDurationRef.current.value;
+        if (premiereSeason) updatedAnime.premiereSeason = premiereSeason;
+        if (demographic) updatedAnime.demographic = demographic;
+        if (formattedAirDate) updatedAnime.airDate = formattedAirDate;
+        if (formattedEndDate) updatedAnime.endDate = formattedEndDate;
+        if (prequel) updatedAnime.prequel = prequel.id;
+        if (sequel) updatedAnime.sequel = sequel.id;
+        if (selectedStudio) updatedAnime.studio = selectedStudio;
+        if (selectedGenres.length > 0) updatedAnime.genre = selectedGenres;
         try{
             console.log(updatedAnime);
             const newAnime = await updateAnime(anime.id, updatedAnime, imageFile);

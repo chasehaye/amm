@@ -2,6 +2,27 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from .managers import CustomUserManager
 from anime.models import Anime
+from django.conf import settings
+from django.core.exceptions import ValidationError
+
+class WatchedEpisodes(models.Model):
+    user = models.ForeignKey( settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='watched_episodes')
+    anime = models.ForeignKey(Anime, on_delete=models.CASCADE, related_name='watched_episodes')
+    episodes_watched = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ['user', 'anime']
+
+    def save(self, *args, **kwargs):
+        print(self.episodes_watched)
+        if self.episodes_watched is None:
+            pass
+        elif self.episodes_watched < 0:
+            self.episodes_watched = None
+        elif self.anime.episodes is not None and self.episodes_watched > self.anime.episodes:
+            self.episodes_watched = self.anime.episodes
+
+        super().save(*args, **kwargs)
 
 # Create your models here.
 class User(AbstractUser):
