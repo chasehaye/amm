@@ -8,8 +8,7 @@ staticfiles/
 
 Procfile
 requirements.txt
-# createsuperuser.py
-# signals.py
+
 
 # END DEPLOY/DEV RELATED 
 
