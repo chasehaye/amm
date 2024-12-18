@@ -6,6 +6,9 @@ staticfiles/
 static/
 staticfiles/
 
+Procfile
+requirements.txt
+
 
 # END DEPLOY/DEV RELATED 
 
