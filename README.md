@@ -3,7 +3,7 @@
 AWS handling -
 
 ## FOR DEPLOTMENT ##
-
+0. Handle super user creation
 1. set DEBUG = False
 2. run - pip freeze > requirements.txt - locally
 3. set up env variables (altered)
