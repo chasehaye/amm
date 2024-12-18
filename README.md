@@ -8,7 +8,7 @@ AWS handling -
 2. run - pip freeze > requirements.txt - locally
 3. set up env variables (altered)
 4. CORS
--heroku git:remote
+-heroku git:remote -a amm
 -git push heroku main
 -after deployment
 4. git remote remove heroku
