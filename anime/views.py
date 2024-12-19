@@ -8,6 +8,10 @@ from .models import Anime, Studio, Genre
 from django.conf import settings
 from amm.utils.token_util import validate_admin
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 # Create your views here.
 class CreateAnimeView(APIView):
     def post(self, request):
@@ -23,10 +27,16 @@ class CreateAnimeView(APIView):
 
             return Response({'message': 'success'})
         except ValidationError as e:
-            print(f'Validation failed: {e.detail}')
+            logger.error(f'Validation failed: {e.detail}')
             return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+
         except AuthenticationFailed as e:
+            logger.error(f'Authentication failed: {str(e)}')
             return Response({'error': str(e)}, status=401)
+
+        except Exception as e:
+            logger.error(f'Unexpected error: {str(e)}')
+            return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class IndexAnimeView(APIView):
     def get(self, request):
