@@ -86,7 +86,10 @@ class AnimeSerializer(serializers.ModelSerializer):
         studio_name = validated_data.pop('studio', None)
         studio_instance = None
         if studio_name:
-            studio_instance, created = Studio.objects.get_or_create(name=studio_name)
+            try:
+                studio_instance = Studio.objects.get(name=studio_name)
+            except Studio.DoesNotExist:
+                studio_instance = None
 
         image = validated_data.pop('image', None)
 
@@ -137,8 +140,11 @@ class AnimeSerializer(serializers.ModelSerializer):
             sequel_instance.save()
         #  handle genre linkage
         for genre_name in genre_data:
-            genre, created = Genre.objects.get_or_create(name=genre_name)
-            anime_instance.genre.add(genre)
+            try:
+                genre = Genre.objects.get(name=genre_name)
+                anime_instance.genre.add(genre)
+            except Genre.DoesNotExist:
+                pass
 
         # save and return
         anime_instance.save()
@@ -191,17 +197,22 @@ class AnimeSerializer(serializers.ModelSerializer):
         if genre_data:
             genre_instances = []
             for genre_name in genre_data:
-                genre_instance, _ = Genre.objects.get_or_create(name=genre_name)
-                genre_instances.append(genre_instance)
-            instance.genre.set(genre_instances)  # Replace genres with new set
+                try:
+                    genre_instance = Genre.objects.get(name=genre_name)
+                    genre_instances.append(genre_instance)
+                except Genre.DoesNotExist:
+                    pass
         else:
             instance.genre.clear() 
 
 
         studio_name = validated_data.pop('studio', None)
         if studio_name:
-            studio_instance, _ = Studio.objects.get_or_create(name=studio_name)
-            instance.studio = studio_instance
+            try:
+                studio_instance = Studio.objects.get(name=studio_name)
+                instance.studio = studio_instance
+            except Studio.DoesNotExist:
+                instance.studio = None
         else:
             instance.studio = None
 

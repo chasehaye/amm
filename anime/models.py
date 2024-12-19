@@ -28,7 +28,7 @@ class Genre(models.Model):
 class Studio(models.Model):
     name = models.CharField(max_length=30, unique=True)
     establishedDate = models.DateField(null=True, blank=True)
-    website = models.CharField(max_length=50, unique=True, blank=True)
+    website = models.CharField(max_length=100, unique=True, blank=True)
 
 # season model
 class Season(models.Model):
