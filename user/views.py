@@ -62,11 +62,11 @@ class LoginView(APIView):
         return response
 
 class UserView(APIView):
-
     def get(self, request):
         token = request.headers.get('Authorization')
         if not token:
-            raise AuthenticationFailed('Unauthenticated')
+            # Return 200 OK with no content if token is missing
+            return Response(None, status=status.HTTP_200_OK)
         
         token = token.split(' ')[1]
 
