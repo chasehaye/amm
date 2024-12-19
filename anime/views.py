@@ -7,10 +7,12 @@ from .serializers import AnimeSerializer, StudioSerializer, GenreSerializer, Ani
 from .models import Anime, Studio, Genre
 from django.conf import settings
 from amm.utils.token_util import validate_admin
+from django.shortcuts import get_object_or_404
 
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 # Create your views here.
 class CreateAnimeView(APIView):
@@ -19,6 +21,7 @@ class CreateAnimeView(APIView):
             user = validate_admin(request)
             if not user:
                 return Response({'error': 'You do not have permission'}, status=status.HTTP_403_FORBIDDEN)
+
             serializer = AnimeSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             

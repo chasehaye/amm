@@ -165,7 +165,7 @@ class GetAnimeListForUserView(APIView):
     def get(self, request, username):
         user_id = request.GET.get('user_id')
         list_type = request.GET.get('list_type')
-
+ 
         if not user_id or not list_type:
             return Response({"message": "Missing required parameters."}, status=400)
         user = get_object_or_404(User, id=user_id)

@@ -86,10 +86,7 @@ class AnimeSerializer(serializers.ModelSerializer):
         studio_name = validated_data.pop('studio', None)
         studio_instance = None
         if studio_name:
-            try:
-                studio_instance = Studio.objects.get(name=studio_name)
-            except Studio.DoesNotExist:
-                studio_instance = None
+            studio_instance, created = Studio.objects.get_or_create(name=studio_name)
 
         image = validated_data.pop('image', None)
 
@@ -120,6 +117,7 @@ class AnimeSerializer(serializers.ModelSerializer):
                         )
                         # Set the image field on the anime instance
                         anime_instance.image = f"{s3_file_path}"
+                        print(f"File uploaded successfully. Final URL: {anime_instance.image}")
                     except Exception as e:
                         print(f"Error uploading file to S3: {e}")
                 else:
@@ -139,12 +137,11 @@ class AnimeSerializer(serializers.ModelSerializer):
             sequel_instance.prequel = anime_instance
             sequel_instance.save()
         #  handle genre linkage
+        if isinstance(genre_data, str):
+            genre_data = genre_data.split(',')
         for genre_name in genre_data:
-            try:
-                genre = Genre.objects.get(name=genre_name)
-                anime_instance.genre.add(genre)
-            except Genre.DoesNotExist:
-                pass
+            genre, created = Genre.objects.get_or_create(name=genre_name)
+            anime_instance.genre.add(genre)
 
         # save and return
         anime_instance.save()
@@ -197,22 +194,17 @@ class AnimeSerializer(serializers.ModelSerializer):
         if genre_data:
             genre_instances = []
             for genre_name in genre_data:
-                try:
-                    genre_instance = Genre.objects.get(name=genre_name)
-                    genre_instances.append(genre_instance)
-                except Genre.DoesNotExist:
-                    pass
+                genre_instance, _ = Genre.objects.get_or_create(name=genre_name)
+                genre_instances.append(genre_instance)
+            instance.genre.set(genre_instances)  # Replace genres with new set
         else:
             instance.genre.clear() 
 
 
         studio_name = validated_data.pop('studio', None)
         if studio_name:
-            try:
-                studio_instance = Studio.objects.get(name=studio_name)
-                instance.studio = studio_instance
-            except Studio.DoesNotExist:
-                instance.studio = None
+            studio_instance, _ = Studio.objects.get_or_create(name=studio_name)
+            instance.studio = studio_instance
         else:
             instance.studio = None
 
