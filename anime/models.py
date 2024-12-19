@@ -77,7 +77,7 @@ class Anime(models.Model):
     titleEnglish = models.CharField(max_length=255, null=True)
     titleJpRoman = models.CharField(max_length=255, unique=True,)
     titleJpKanji = models.CharField(max_length=255, null=True)
-    description = models.CharField(max_length=1000, null=True)
+    description = models.CharField(max_length=3000, null=True)
     image = models.ImageField(upload_to='anime_images/', null=True, blank=True)
     type = models.CharField(choices=TYPES, null=True)
     episodes = models.IntegerField(null=True)
