@@ -117,7 +117,6 @@ class AnimeSerializer(serializers.ModelSerializer):
                         )
                         # Set the image field on the anime instance
                         anime_instance.image = f"{s3_file_path}"
-                        print(f"File uploaded successfully. Final URL: {anime_instance.image}")
                     except Exception as e:
                         print(f"Error uploading file to S3: {e}")
                 else:

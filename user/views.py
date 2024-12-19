@@ -11,7 +11,6 @@ from .models import User, WatchedEpisodes
 from django.shortcuts import get_object_or_404
 from anime.models import Anime, Rating
 from anime.serializers import AnimeSerializer
-from amm.utils.token_util import validate_retrieve_user
 
 # UserViews
 
