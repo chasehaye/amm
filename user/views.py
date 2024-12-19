@@ -30,14 +30,6 @@ class RegisterView(APIView):
         token = jwt.encode(payload, 'secret', algorithm='HS256')
 
         response = Response()
-        response.set_cookie(
-            key='jwt', 
-            value=token, 
-            httponly=True, 
-            secure=True,
-            samesite='None',
-            path='/' 
-        )
         response.data = {
             'jwt': token,
         }
@@ -63,14 +55,6 @@ class LoginView(APIView):
         token = jwt.encode(payload, 'secret', algorithm='HS256')
 
         response = Response()
-        response.set_cookie(
-            key='jwt', 
-            value=token, 
-            httponly=True, 
-            secure=True,
-            samesite='None',
-            path='/'
-        )
         response.data = {
             'jwt': token
         }
@@ -80,9 +64,12 @@ class LoginView(APIView):
 class UserView(APIView):
 
     def get(self, request):
-        token = request.COOKIES.get('jwt')
+        token = request.headers.get('Authorization')
         if not token:
             raise AuthenticationFailed('Unauthenticated')
+        
+        token = token.split(' ')[1]
+
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
@@ -96,7 +83,6 @@ class UserView(APIView):
 class LogoutView(APIView):
     def post(self, request):
         response = Response()
-        response.delete_cookie('jwt', path='/', samesite='None', secure=True)
         response.data = {
             'message': 'Successfully logged out'
         }
@@ -104,9 +90,12 @@ class LogoutView(APIView):
     
 class PermissionView(APIView):
     def get(self, request):
-        token = request.COOKIES.get('jwt')
+        token = request.headers.get('Authorization')
         if not token:
             raise AuthenticationFailed('Unauthenticated')
+        
+        token = token.split(' ')[1]
+        
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
