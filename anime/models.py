@@ -19,21 +19,21 @@ TYPES = [
 
 # genre model
 class Genre(models.Model):
-    name = models.CharField(max_length=25, unique=True)
+    name = models.CharField(unique=True)
 
     def __str__(self):
         return self.name
 
 # studio model
 class Studio(models.Model):
-    name = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=200, unique=True)
     establishedDate = models.DateField(null=True, blank=True)
-    website = models.CharField(max_length=100, unique=True, blank=True)
+    website = models.CharField(max_length=300, unique=True, blank=True)
 
 # season model
 class Season(models.Model):
     year = models.IntegerField()
-    season = models.CharField(max_length=20, choices=[
+    season = models.CharField(choices=[
         ("Spring", "Spring"),
         ("Summer", "Summer"),
         ("Fall", "Fall"),

@@ -145,6 +145,7 @@ class AnimeSerializer(serializers.ModelSerializer):
 
         # save and return
         anime_instance.save()
+
         return anime_instance
     
 
