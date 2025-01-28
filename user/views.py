@@ -32,7 +32,7 @@ class RegisterView(APIView):
         response.data = {
             'jwt': token,
         }
-
+        
         return response
     
 class LoginView(APIView):

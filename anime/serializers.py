@@ -4,6 +4,7 @@ from rest_framework import serializers
 from .models import Anime, Season, Genre, Studio, TYPES
 from user.models import User
 import mimetypes
+from django.core.exceptions import ObjectDoesNotExist
 
 class AnimeAbbrvSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,7 +45,12 @@ class AnimeSerializer(serializers.ModelSerializer):
 
     created_by = serializers.SerializerMethodField()
     def get_created_by(self, obj):
-        return obj.created_by.name if obj.created_by else "N/A"
+        return obj.created_by.name if obj.created_by else "-"
+    created_by_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        write_only=True,
+        required=False
+    )
     
 
     class Meta:
@@ -70,12 +76,17 @@ class AnimeSerializer(serializers.ModelSerializer):
                   'created_at',
                   'updated_at',
                   'image',
-                  'created_by'
+                  'created_by',
+                  'created_by_id'
                  ]
         
 
 
     def create(self, validated_data):
+
+        created_by_instance = validated_data.pop('created_by_id', None)
+
+
         # handle data parsing
         premiere_season_str = validated_data.pop('premiereSeason', None)
         season_instance = None
@@ -88,6 +99,8 @@ class AnimeSerializer(serializers.ModelSerializer):
         sequel_instance = validated_data.pop('sequel', None)
 
         genre_data = validated_data.pop('genre', [])
+        if genre_data is None:
+            genre_data = []
 
         studio_name = validated_data.pop('studio', None)
         studio_instance = None
@@ -97,8 +110,7 @@ class AnimeSerializer(serializers.ModelSerializer):
         image = validated_data.pop('image', None)
 
 
-
-        anime_instance = self.Meta.model.objects.create(premiereSeason=season_instance, studio=studio_instance, **validated_data)
+        anime_instance = self.Meta.model.objects.create(premiereSeason=season_instance, studio=studio_instance, created_by=created_by_instance, **validated_data)
 
 
         if image:
@@ -143,12 +155,12 @@ class AnimeSerializer(serializers.ModelSerializer):
             sequel_instance.prequel = anime_instance
             sequel_instance.save()
         #  handle genre linkage
-        if isinstance(genre_data, str):
-            genre_data = genre_data.split(',')
         for genre_name in genre_data:
-            genre, created = Genre.objects.get_or_create(name=genre_name)
-            anime_instance.genre.add(genre)
-
+            try:
+                genre = Genre.objects.get(name=genre_name)
+                anime_instance.genre.add(genre)
+            except ObjectDoesNotExist:
+                print(f"Genre '{genre_name}' does not exist.")
         # save and return
         anime_instance.save()
 
