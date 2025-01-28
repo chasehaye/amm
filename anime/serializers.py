@@ -2,6 +2,7 @@ import boto3
 from django.conf import settings
 from rest_framework import serializers
 from .models import Anime, Season, Genre, Studio, TYPES
+from user.models import User
 import mimetypes
 
 class AnimeAbbrvSerializer(serializers.ModelSerializer):
@@ -39,7 +40,11 @@ class AnimeSerializer(serializers.ModelSerializer):
         default=[],
         min_length=0
     )
-    studio = serializers.CharField(write_only=True, allow_null=True, required=False,)
+    studio = serializers.CharField(write_only=True, allow_null=True, required=False)
+
+    created_by = serializers.SerializerMethodField()
+    def get_created_by(self, obj):
+        return obj.created_by.name if obj.created_by else "N/A"
     
 
     class Meta:
@@ -64,7 +69,8 @@ class AnimeSerializer(serializers.ModelSerializer):
                   'studio',
                   'created_at',
                   'updated_at',
-                  'image'
+                  'image',
+                  'created_by'
                  ]
         
 

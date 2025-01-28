@@ -5,6 +5,11 @@ from rest_framework.exceptions import AuthenticationFailed, NotFound, Validation
 from django.db.models import Q
 from .serializers import AnimeSerializer, StudioSerializer, GenreSerializer, AnimeAbbrvSerializer
 from .models import Anime, Studio, Genre
+from user.models import User
+from django.core.exceptions import FieldError
+from itertools import chain
+
+
 from django.conf import settings
 from amm.utils.token_util import validate_admin
 from django.shortcuts import get_object_or_404
@@ -50,19 +55,36 @@ class IndexAnimeView(APIView):
 class OrderIndexAnimeView(APIView):
     def get(self, request):
         # retrieve fileds
+        user_name = request.query_params.get('user', None)
         order_by = request.query_params.get('order_by', 'titleJpRoman')
-        order = request.query_params.get('order', 'desc')
+        order = request.query_params.get('order', 'des')
 
-        # set and fill filter
-        filters = {}
-        queryset = Anime.objects.filter(**filters)
-
-        if order == 'asc':
-            queryset = queryset.order_by(order_by)
+        if user_name:
+            try:
+                user = User.objects.get(name=user_name)
+                user_animes = Anime.objects.filter(created_by=user.id)
+                other_animes = Anime.objects.exclude(created_by=user.id)
+                if order == 'asc':
+                    user_animes = user_animes.order_by(order_by)
+                    other_animes = other_animes.order_by(order_by)
+                else:
+                    user_animes = user_animes.order_by(f'-{order_by}')
+                    other_animes = other_animes.order_by(f'-{order_by}')
+                final_queryset = chain(user_animes, other_animes)
+            except User.DoesNotExist:
+                return Response({"error": "User not found"}, status=404)
         else:
-            queryset = queryset.order_by(f'-{order_by}')
+            final_queryset = Anime.objects.all()
+            try:
+                if order == 'asc':
+                    final_queryset = final_queryset.order_by(order_by)
+                else:
+                    final_queryset = final_queryset.order_by(f'-{order_by}')
+            except FieldError:
+                return Response({"error": f"Invalid field '{order_by}' for ordering"}, status=400)
+        
+        serializer = AnimeSerializer(final_queryset, many=True)
 
-        serializer = AnimeSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     
