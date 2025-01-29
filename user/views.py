@@ -170,31 +170,47 @@ class GetAnimeListForUserView(APIView):
             return Response({"message": "Missing required parameters."}, status=400)
         user = get_object_or_404(User, id=user_id)
         if list_type == '0':
-                anime_list = (
-                    list(user.currently_watching.all()) +
-                    list(user.completed.all()) +
-                    list(user.plan_to_watch.all()) +
-                    list(user.dropped.all()) +
-                    list(user.interested_in.all()) +
-                    list(user.on_hold.all())
-                )
+            anime_list = {
+                "currently_watching": AnimeSerializer(user.currently_watching.all(), many=True).data,
+                "completed": AnimeSerializer(user.completed.all(), many=True).data,
+                "plan_to_watch": AnimeSerializer(user.plan_to_watch.all(), many=True).data,
+                "dropped": AnimeSerializer(user.dropped.all(), many=True).data,
+                "interested_in": AnimeSerializer(user.interested_in.all(), many=True).data,
+                "on_hold": AnimeSerializer(user.on_hold.all(), many=True).data,
+            }
+            return Response(anime_list, status=200)
         elif list_type == '1':
-            anime_list = user.currently_watching.all()
+            anime_list = {
+                "currently_watching": AnimeSerializer(user.currently_watching.all(), many=True).data
+            }
+            return Response(anime_list, status=200)
         elif list_type == '2':
-            anime_list = user.completed.all()
+            anime_list = {
+                "completed": AnimeSerializer(user.completed.all(), many=True).data
+            }
+            return Response(anime_list, status=200)
         elif list_type == '3':
-            anime_list = user.plan_to_watch.all()
+            anime_list = {
+                "plan_to_watch": AnimeSerializer(user.plan_to_watch.all(), many=True).data
+            }
+            return Response(anime_list, status=200)
         elif list_type == '4':
-            anime_list = user.dropped.all()
+            anime_list = {
+                "dropped": AnimeSerializer(user.dropped.all(), many=True).data
+            }
+            return Response(anime_list, status=200)
         elif list_type == '5':
-            anime_list = user.interested_in.all()
+            anime_list = {
+                "interested_in": AnimeSerializer(user.interested_in.all(), many=True).data
+            }
+            return Response(anime_list, status=200)
         elif list_type == '6':
-            anime_list = user.on_hold.all()
+            anime_list = {
+                "on_hold": AnimeSerializer(user.on_hold.all(), many=True).data
+            }
+            return Response(anime_list, status=200)
         else:
             return Response({"message": "Invalid list type provided."}, status=400)
-        
-        serializer = AnimeSerializer(anime_list, many=True)
-        return Response(serializer.data, status=200)
     
 class RateAnimeForUserView(APIView):
     def post(self, request, username, animeId):
