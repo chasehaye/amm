@@ -8,6 +8,7 @@ from .models import Anime, Studio, Genre
 from user.models import User
 from django.core.exceptions import FieldError
 from itertools import chain
+from django.db.models import F, Case, When, Value, IntegerField
 
 
 from django.conf import settings
@@ -79,7 +80,13 @@ class OrderIndexAnimeView(APIView):
                 if order == 'asc':
                     final_queryset = final_queryset.order_by(order_by)
                 else:
-                    final_queryset = final_queryset.order_by(f'-{order_by}')
+                    final_queryset = final_queryset.annotate(
+                        is_null=Case(
+                            When(**{order_by: None}, then=Value(1)),
+                            default=Value(0),
+                            output_field=IntegerField(),
+                        )
+                    ).order_by('is_null', F(order_by).desc())
             except FieldError:
                 return Response({"error": f"Invalid field '{order_by}' for ordering"}, status=400)
         
